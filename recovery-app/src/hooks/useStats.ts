@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { analyzeCheckin } from '../lib/analyzeCheckin'
 import type { CheckIn, RelapsePattern, DayStatus } from '../types'
 
 export function useStats(userId: string | null) {
@@ -57,6 +58,9 @@ export function useStats(userId: string | null) {
       patternType: row.pattern_type,
       description: row.description,
       frequency: row.frequency,
+      tags: row.tags ?? [],
+      lastSeen: row.last_seen ?? null,
+      side: (row.side ?? 'regression') as 'regression' | 'protective',
     }))
 
     setPatterns(mapped)
@@ -111,6 +115,22 @@ export function useStats(userId: string | null) {
       if (exists) return prev.map((c) => c.date === date ? saved : c)
       return [...prev, saved].sort((a, b) => a.date.localeCompare(b.date))
     })
+
+    // Fire-and-forget AI analysis — won't block the UI
+    // For relapses: analyze the relapse_reason
+    // For clean days: analyze the note (what helped)
+    const textToAnalyze = status === 'relapse' ? relapseReason : note
+    if (textToAnalyze && textToAnalyze.trim().length >= 5) {
+      console.log('[useStats] Running pattern analysis for:', status, textToAnalyze)
+      analyzeCheckin(userId, data.id, status, textToAnalyze)
+        .then(() => {
+          console.log('[useStats] Pattern analysis done, refreshing patterns')
+          fetchPatterns()
+        })
+        .catch((err) => console.error('[useStats] Analysis error:', err))
+    } else {
+      console.log('[useStats] Skipping analysis — no text or too short:', textToAnalyze)
+    }
 
     return saved
   }

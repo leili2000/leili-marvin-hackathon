@@ -43,6 +43,8 @@ export type DbCheckIn = {
   status: 'clean' | 'relapse'
   note: string | null
   relapse_reason: string | null
+  ai_tags: string[]
+  ai_processed: boolean
   created_at: string
 }
 
@@ -52,5 +54,8 @@ export type DbRelapsePattern = {
   pattern_type: string
   description: string
   frequency: number
+  tags: string[]
+  last_seen: string | null
+  side: 'regression' | 'protective'
   created_at: string
 }
