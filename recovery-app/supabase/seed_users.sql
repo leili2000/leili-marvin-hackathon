@@ -1,18 +1,20 @@
 -- ─────────────────────────────────────────────────────────────────
 -- Seed fake users for Recover app
 -- Run this BEFORE seed.sql
---
--- Creates fake auth users + their profiles in one transaction.
--- Passwords are all set to: Password123!
+-- All passwords: Password123!
 -- ─────────────────────────────────────────────────────────────────
 
--- Insert fake users directly into auth.users (Supabase allows this in SQL Editor)
 insert into auth.users (
   id,
   instance_id,
   email,
   encrypted_password,
   email_confirmed_at,
+  confirmation_token,
+  recovery_token,
+  email_change,
+  email_change_token_new,
+  email_change_token_current,
   created_at,
   updated_at,
   raw_app_meta_data,
@@ -27,7 +29,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'sunrisewalker@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"Sunrise Walker","recovery_start_date":"2026-04-01"}',
     false, 'authenticated', 'authenticated'
@@ -37,7 +40,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'riverstone@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"River Stone","recovery_start_date":"2026-03-15"}',
     false, 'authenticated', 'authenticated'
@@ -47,7 +51,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'quietharbor@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"Quiet Harbor","recovery_start_date":"2025-10-30"}',
     false, 'authenticated', 'authenticated'
@@ -57,7 +62,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'morningtide@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"Morning Tide","recovery_start_date":"2026-02-01"}',
     false, 'authenticated', 'authenticated'
@@ -67,7 +73,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'stillstanding@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"Still Standing","recovery_start_date":"2026-01-10"}',
     false, 'authenticated', 'authenticated'
@@ -77,7 +84,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'newchapter@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"New Chapter","recovery_start_date":"2025-12-01"}',
     false, 'authenticated', 'authenticated'
@@ -87,7 +95,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'steadybreath@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"Steady Breath","recovery_start_date":"2026-03-01"}',
     false, 'authenticated', 'authenticated'
@@ -97,7 +106,8 @@ values
     '00000000-0000-0000-0000-000000000000',
     'openroad@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"Open Road","recovery_start_date":"2025-04-26"}',
     false, 'authenticated', 'authenticated'
@@ -107,15 +117,15 @@ values
     '00000000-0000-0000-0000-000000000000',
     'clearsky@seed.recover',
     crypt('Password123!', gen_salt('bf')),
-    now(), now(), now(),
+    now(), '', '', '', '', '',
+    now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"username":"Clear Sky","recovery_start_date":"2026-01-01"}',
     false, 'authenticated', 'authenticated'
   )
 on conflict (id) do nothing;
 
--- The on_auth_user_created trigger will auto-create profile rows.
--- If the trigger isn't firing, run this to create profiles manually:
+-- Manually create profiles in case the trigger didn't fire
 insert into public.profiles (id, username, tracking_mode, recovery_start_date)
 values
   ('00000000-0000-0000-0000-000000000002', 'Sunrise Walker',  'auto_increment', '2026-04-01'),

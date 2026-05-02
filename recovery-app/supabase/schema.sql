@@ -24,7 +24,8 @@ begin
       (new.raw_user_meta_data->>'recovery_start_date')::date,
       current_date
     )
-  );
+  )
+  on conflict (id) do nothing;  -- safe to call multiple times
   return new;
 end;
 $$ language plpgsql security definer;
