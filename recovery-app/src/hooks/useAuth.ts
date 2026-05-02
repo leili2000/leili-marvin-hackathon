@@ -36,11 +36,26 @@ export function useAuth() {
   }, [])
 
   const loadProfile = async (user: User, session: Session) => {
-    const { data: profile } = await supabase
+    let { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
+
+    // Profile missing — create it on the fly (handles edge cases after schema resets)
+    if (!profile) {
+      const { data: created } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          username: user.user_metadata?.username ?? user.email?.split('@')[0] ?? 'Anonymous',
+          tracking_mode: 'auto_increment',
+          recovery_start_date: user.user_metadata?.recovery_start_date ?? new Date().toISOString().split('T')[0],
+        })
+        .select()
+        .single()
+      profile = created
+    }
 
     if (profile) {
       setAuthState({
@@ -54,7 +69,6 @@ export function useAuth() {
         },
       })
     } else {
-      // Profile doesn't exist yet — will be created on sign-up
       setAuthState({ status: 'unauthenticated' })
     }
   }
