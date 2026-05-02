@@ -1,19 +1,21 @@
 import React, { useState } from 'react'
-import type { Post, PostType } from '../../types'
-import { mockPosts, mockReplies, anonymousNames } from '../../data/mockData'
+import type { PostType } from '../../types'
+import { usePosts } from '../../hooks/usePosts'
 import { PostCard } from './PostCard'
 import { VentBarrier } from './VentBarrier'
 import { NewPostForm } from './NewPostForm'
 import { InboxPanel } from './InboxPanel'
 
-const CURRENT_USER_ID = 'user-001'
+interface SocialTabProps {
+  currentUserId: string
+}
+
 const VENT_LIMIT = 3
 
 type SocialView = 'feed' | 'new-post' | 'inbox'
 
-export const SocialTab: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>(mockPosts)
-  const [replies] = useState(mockReplies)
+export const SocialTab: React.FC<SocialTabProps> = ({ currentUserId }) => {
+  const { posts, replies, loading, error, createPost, sendReply } = usePosts(currentUserId)
   const [view, setView] = useState<SocialView>('feed')
   const [filter, setFilter] = useState<PostType | 'all'>('all')
 
@@ -23,23 +25,15 @@ export const SocialTab: React.FC = () => {
   const [showVentBarrier, setShowVentBarrier] = useState(false)
   const [pendingVentAction, setPendingVentAction] = useState<(() => void) | null>(null)
 
-  const handleReply = (postId: string, content: string) => {
-    // In production this would call Supabase
-    console.log('Reply sent to post', postId, ':', content)
+  const handleReply = async (postId: string, content: string) => {
+    // Find the post author to send the reply to them
+    const post = posts.find((p) => p.id === postId)
+    if (!post) return
+    await sendReply(postId, post.userId, content)
   }
 
-  const handleNewPost = (type: PostType, content: string) => {
-    const randomName = anonymousNames[Math.floor(Math.random() * anonymousNames.length)]
-    const newPost: Post = {
-      id: `post-${Date.now()}`,
-      userId: CURRENT_USER_ID,
-      type,
-      content,
-      createdAt: new Date().toISOString(),
-      anonymousName: randomName,
-      replyCount: 0,
-    }
-    setPosts((prev) => [newPost, ...prev])
+  const handleNewPost = async (type: PostType, content: string) => {
+    await createPost(type, content)
     setView('feed')
   }
 
@@ -47,7 +41,6 @@ export const SocialTab: React.FC = () => {
     if (ventBarrierPassed && ventPostsSeen < VENT_LIMIT) {
       setFilter('vent')
     } else {
-      // Need to go through barrier
       setPendingVentAction(() => () => {
         setFilter('vent')
         setVentBarrierPassed(true)
@@ -62,7 +55,6 @@ export const SocialTab: React.FC = () => {
     const newCount = ventPostsSeen + 1
     setVentPostsSeen(newCount)
     if (newCount >= VENT_LIMIT) {
-      // Reset barrier after limit
       setVentBarrierPassed(false)
     }
   }
@@ -96,10 +88,7 @@ export const SocialTab: React.FC = () => {
   if (view === 'new-post') {
     return (
       <div className="social-tab">
-        <NewPostForm
-          onSubmit={handleNewPost}
-          onCancel={() => setView('feed')}
-        />
+        <NewPostForm onSubmit={handleNewPost} onCancel={() => setView('feed')} />
       </div>
     )
   }
@@ -131,30 +120,18 @@ export const SocialTab: React.FC = () => {
       </div>
 
       <div className="social-tab__filters">
-        <button
-          className={`filter-btn ${filter === 'all' ? 'filter-btn--active' : ''}`}
-          onClick={() => setFilter('all')}
-        >
-          All
-        </button>
-        <button
-          className={`filter-btn ${filter === 'milestone' ? 'filter-btn--active' : ''}`}
-          onClick={() => setFilter('milestone')}
-        >
-          🏆 Milestones
-        </button>
-        <button
-          className={`filter-btn ${filter === 'happy' ? 'filter-btn--active' : ''}`}
-          onClick={() => setFilter('happy')}
-        >
-          ☀️ Good Things
-        </button>
-        <button
-          className={`filter-btn ${filter === 'vent' ? 'filter-btn--active' : ''}`}
-          onClick={handleVentFilterClick}
-        >
-          💬 Vent Posts
-        </button>
+        {(['all', 'milestone', 'happy', 'vent'] as const).map((f) => (
+          <button
+            key={f}
+            className={`filter-btn ${filter === f ? 'filter-btn--active' : ''}`}
+            onClick={f === 'vent' ? handleVentFilterClick : () => setFilter(f)}
+          >
+            {f === 'all' && 'All'}
+            {f === 'milestone' && '🏆 Milestones'}
+            {f === 'happy' && '☀️ Good Things'}
+            {f === 'vent' && '💬 Vent Posts'}
+          </button>
+        ))}
       </div>
 
       {filter === 'vent' && ventBarrierPassed && (
@@ -168,23 +145,26 @@ export const SocialTab: React.FC = () => {
         </div>
       )}
 
+      {loading && <div className="loading-state">Loading posts...</div>}
+      {error && <div className="error-state">Couldn't load posts. {error}</div>}
+
       <div className="social-tab__feed">
-        {filter !== 'vent' &&
+        {!loading && filter !== 'vent' &&
           filteredPosts.map((post) => (
             <PostCard
               key={post.id}
               post={post}
-              currentUserId={CURRENT_USER_ID}
+              currentUserId={currentUserId}
               onReply={handleReply}
             />
           ))}
 
-        {filter === 'vent' && ventBarrierPassed &&
+        {!loading && filter === 'vent' && ventBarrierPassed &&
           ventPosts.slice(0, VENT_LIMIT).map((post, idx) => (
             <PostCard
               key={post.id}
               post={post}
-              currentUserId={CURRENT_USER_ID}
+              currentUserId={currentUserId}
               onReply={(postId, content) => {
                 handleReply(postId, content)
                 if (idx === 0) handleVentPostView()
@@ -192,7 +172,7 @@ export const SocialTab: React.FC = () => {
             />
           ))}
 
-        {filter === 'vent' && !ventBarrierPassed && (
+        {!loading && filter === 'vent' && !ventBarrierPassed && (
           <div className="empty-state">
             <p>Complete the check-in to view vent posts.</p>
             <button className="btn btn--primary" onClick={handleVentFilterClick}>
@@ -201,7 +181,7 @@ export const SocialTab: React.FC = () => {
           </div>
         )}
 
-        {filter !== 'vent' && filteredPosts.length === 0 && (
+        {!loading && filter !== 'vent' && filteredPosts.length === 0 && (
           <div className="empty-state">
             <p>No posts here yet. Be the first to share.</p>
           </div>

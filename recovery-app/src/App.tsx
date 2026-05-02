@@ -1,12 +1,43 @@
 import { useState } from 'react'
+import { useAuth } from './hooks/useAuth'
 import { SocialTab } from './components/social/SocialTab'
 import { StatsTab } from './components/stats/StatsTab'
+import { AuthScreen } from './components/auth/AuthScreen'
+import type { TrackingMode } from './types'
 import './App.css'
 
 type Tab = 'social' | 'stats'
 
 function App() {
+  const { authState, signIn, signUp, signOut, updateTrackingMode } = useAuth()
   const [activeTab, setActiveTab] = useState<Tab>('social')
+
+  // ─── Loading ──────────────────────────────────────────────────
+  if (authState.status === 'loading') {
+    return (
+      <div className="app-loading">
+        <span className="app-loading__logo">🌱</span>
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  // ─── Unauthenticated ──────────────────────────────────────────
+  if (authState.status === 'unauthenticated') {
+    return (
+      <AuthScreen
+        onSignIn={signIn}
+        onSignUp={signUp}
+      />
+    )
+  }
+
+  // ─── Authenticated ────────────────────────────────────────────
+  const { user } = authState
+
+  const handleTrackingModeChange = async (mode: TrackingMode) => {
+    await updateTrackingMode(user.id, mode)
+  }
 
   return (
     <div className="app">
@@ -16,7 +47,12 @@ function App() {
             <span className="app-header__logo">🌱</span>
             <span className="app-header__name">Recover</span>
           </div>
-          <div className="app-header__user">Alex M.</div>
+          <div className="app-header__right">
+            <span className="app-header__user">{user.username}</span>
+            <button className="btn btn--ghost btn--sm" onClick={signOut}>
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -36,7 +72,17 @@ function App() {
       </nav>
 
       <main className="app-main">
-        {activeTab === 'social' ? <SocialTab /> : <StatsTab />}
+        {activeTab === 'social' ? (
+          <SocialTab currentUserId={user.id} />
+        ) : (
+          <StatsTab
+            userId={user.id}
+            username={user.username}
+            trackingMode={user.trackingMode}
+            recoveryStartDate={user.recoveryStartDate}
+            onTrackingModeChange={handleTrackingModeChange}
+          />
+        )}
       </main>
     </div>
   )
