@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Replace these with your actual Supabase project URL and anon key
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
@@ -14,8 +13,8 @@ export type Database = {
           id: string
           username: string
           tracking_mode: 'daily_checkin' | 'auto_increment'
-          created_at: string
           recovery_start_date: string
+          created_at: string
         }
       }
       posts: {
@@ -24,8 +23,8 @@ export type Database = {
           user_id: string
           type: 'milestone' | 'happy' | 'vent'
           content: string
-          created_at: string
           anonymous_name: string
+          created_at: string
         }
       }
       replies: {
@@ -46,6 +45,8 @@ export type Database = {
           status: 'clean' | 'relapse'
           note: string | null
           relapse_reason: string | null
+          ai_tags: string[]
+          ai_processed: boolean
           created_at: string
         }
       }
@@ -56,7 +57,22 @@ export type Database = {
           pattern_type: string
           description: string
           frequency: number
+          tags: string[]
+          last_seen: string | null
           created_at: string
+        }
+      }
+    }
+    Views: {
+      replies_with_sender: {
+        Row: {
+          id: string
+          post_id: string
+          sender_id: string
+          recipient_id: string
+          content: string
+          created_at: string
+          sender_name: string
         }
       }
     }

@@ -12,6 +12,24 @@ alter table profiles enable row level security;
 create policy "Users can view and edit their own profile"
   on profiles for all using (auth.uid() = id);
 
+-- ─── Auto-create profile on signup ───────────────────────────────
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, username, recovery_start_date)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'username', 'Anonymous'),
+    current_date
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
 -- ─── Posts ───────────────────────────────────────────────────────
 create table posts (
   id uuid primary key default gen_random_uuid(),
@@ -31,7 +49,6 @@ create policy "Users manage their own posts"
   on posts for all using (auth.uid() = user_id);
 
 -- ─── Replies ─────────────────────────────────────────────────────
--- Replies are private: only sender and recipient can see them
 create table replies (
   id uuid primary key default gen_random_uuid(),
   post_id uuid references posts(id) on delete cascade not null,
@@ -48,6 +65,19 @@ create policy "Only sender and recipient can see replies"
 create policy "Authenticated users can send replies"
   on replies for insert with check (auth.uid() = sender_id);
 
+-- View that joins sender username so the frontend doesn't need a second query
+create view replies_with_sender as
+  select
+    r.id,
+    r.post_id,
+    r.sender_id,
+    r.recipient_id,
+    r.content,
+    r.created_at,
+    p.username as sender_name
+  from replies r
+  join profiles p on p.id = r.sender_id;
+
 -- ─── Check-ins ───────────────────────────────────────────────────
 create table checkins (
   id uuid primary key default gen_random_uuid(),
@@ -56,6 +86,9 @@ create table checkins (
   status text not null check (status in ('clean', 'relapse')),
   note text,
   relapse_reason text,
+  -- AI-populated fields
+  ai_tags text[] default '{}',
+  ai_processed boolean default false,
   created_at timestamptz not null default now(),
   unique (user_id, date)
 );
@@ -72,6 +105,8 @@ create table relapse_patterns (
   pattern_type text not null,
   description text not null,
   frequency int not null default 1,
+  tags text[] default '{}',
+  last_seen date,
   created_at timestamptz not null default now()
 );
 
