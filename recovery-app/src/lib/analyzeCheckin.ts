@@ -2,6 +2,7 @@
  * analyzeCheckin.ts
  *
  * Uses Puter.js (free, no API key) to analyze check-in notes.
+ * Puter is loaded via CDN in index.html and available as window.puter.
  *
  * Relapse entry  → extracts triggers  ("things that make you regress")
  * Clean entry    → extracts habits    ("things that help you stay clean")
@@ -9,8 +10,16 @@
  * Results are upserted into relapse_patterns in Supabase.
  */
 
-import puter from 'puter'
 import { supabase } from './supabase'
+
+// Puter is a CDN global — declare it so TypeScript doesn't complain
+declare const puter: {
+  ai: {
+    chat: (prompt: string, options?: { model?: string }) => Promise<{
+      message?: { content: string }
+    } | string>
+  }
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
