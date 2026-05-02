@@ -1,25 +1,16 @@
 /**
  * analyzeCheckin.ts
  *
- * Uses Puter.js (free, no API key) to analyze check-in notes.
- * Puter is loaded via CDN in index.html and available as window.puter.
+ * Uses the Puter REST API directly (no CDN, no npm package).
+ * Free tier — no API key required for basic usage.
  *
  * Relapse entry  → extracts triggers  ("things that make you regress")
  * Clean entry    → extracts habits    ("things that help you stay clean")
- *
- * Results are upserted into relapse_patterns in Supabase.
  */
 
 import { supabase } from './supabase'
 
-// Puter is a CDN global — declare it so TypeScript doesn't complain
-declare const puter: {
-  ai: {
-    chat: (prompt: string, options?: { model?: string }) => Promise<{
-      message?: { content: string }
-    } | string>
-  }
-}
+const PUTER_API_URL = 'https://api.puter.com/drivers/call'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -60,19 +51,39 @@ Extract the key protective habits or factors. Reply with ONLY this JSON (no expl
 }`
 }
 
-// ─── Puter AI call ────────────────────────────────────────────────────────────
+// ─── API call ─────────────────────────────────────────────────────────────────
 
-async function callPuterAI(prompt: string): Promise<AnalysisResult | null> {
+async function callAI(prompt: string): Promise<AnalysisResult | null> {
   try {
-    // puter.ai.chat returns a response object with .message.content
-    const response = await puter.ai.chat(prompt, { model: 'gpt-4o-mini' })
-    const raw: string = response?.message?.content ?? response
+    const res = await fetch(PUTER_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        interface: 'puter-chat-completion',
+        driver: 'openai-completion',
+        test_mode: false,
+        call: {
+          messages: [{ role: 'user', content: prompt }],
+        },
+      }),
+    })
 
-    // Strip any accidental markdown code fences
+    if (!res.ok) {
+      console.error('[analyzeCheckin] API error:', res.status)
+      return null
+    }
+
+    const json = await res.json()
+    const raw: string = json?.result?.message?.content
+      ?? json?.result?.choices?.[0]?.message?.content
+      ?? ''
+
+    if (!raw) return null
+
     const cleaned = raw.replace(/```json|```/g, '').trim()
     return JSON.parse(cleaned) as AnalysisResult
   } catch (err) {
-    console.error('[analyzeCheckin] Puter AI call failed:', err)
+    console.error('[analyzeCheckin] AI call failed:', err)
     return null
   }
 }
@@ -84,7 +95,6 @@ async function upsertPattern(
   checkinId: string,
   result: AnalysisResult
 ): Promise<void> {
-  // If same pattern type + side already exists for this user, increment frequency
   const { data: existing } = await supabase
     .from('relapse_patterns')
     .select('id, frequency')
@@ -115,7 +125,6 @@ async function upsertPattern(
     })
   }
 
-  // Mark checkin as processed so we don't re-analyze on edits
   await supabase
     .from('checkins')
     .update({ ai_tags: result.tags, ai_processed: true })
@@ -125,8 +134,8 @@ async function upsertPattern(
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 /**
- * Fire-and-forget. Call this after saving a check-in.
- * Skips silently if text is too short or AI fails.
+ * Fire-and-forget. Call after saving a check-in.
+ * Skips silently if text is too short or AI is unavailable.
  */
 export async function analyzeCheckin(
   userId: string,
@@ -138,7 +147,7 @@ export async function analyzeCheckin(
   if (trimmed.length < 10) return
 
   const prompt = buildPrompt(status, trimmed)
-  const result = await callPuterAI(prompt)
+  const result = await callAI(prompt)
   if (!result) return
 
   await upsertPattern(userId, checkinId, result)
