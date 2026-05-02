@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { ColorPicker, applyThemeColor } from '../ColorPicker'
 
 interface AuthScreenProps {
   onSignIn: (email: string, password: string) => Promise<void>
@@ -6,46 +7,111 @@ interface AuthScreenProps {
     email: string,
     password: string,
     username: string,
-    recoveryStartDate: string
+    recoveryStartDate: string,
+    themeColor: string
   ) => Promise<void>
 }
 
 type AuthMode = 'signin' | 'signup'
+type SignupStep = 'form' | 'color'
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onSignIn, onSignUp }) => {
   const [mode, setMode] = useState<AuthMode>('signin')
+  const [step, setStep] = useState<SignupStep>('form')
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
   const [recoveryStartDate, setRecoveryStartDate] = useState(
     new Date().toISOString().split('T')[0]
   )
+  const [themeColor, setThemeColor] = useState('forest')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleColorChange = (colorId: string) => {
+    setThemeColor(colorId)
+    applyThemeColor(colorId) // live preview
+  }
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setLoading(true)
 
-    try {
-      if (mode === 'signin') {
+    if (mode === 'signin') {
+      setLoading(true)
+      try {
         await onSignIn(email, password)
-      } else {
-        if (!username.trim()) {
-          setError('Please enter a display name.')
-          setLoading(false)
-          return
-        }
-        await onSignUp(email, password, username.trim(), recoveryStartDate)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
+      } finally {
+        setLoading(false)
       }
+      return
+    }
+
+    // Signup — go to color picker step first
+    if (!username.trim()) {
+      setError('Please enter a display name.')
+      return
+    }
+    setStep('color')
+  }
+
+  const handleColorSubmit = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      await onSignUp(email, password, username.trim(), recoveryStartDate, themeColor)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
+      setStep('form') // go back on error
     } finally {
       setLoading(false)
     }
   }
 
+  // ─── Color picker step ────────────────────────────────────────
+  if (mode === 'signup' && step === 'color') {
+    return (
+      <div className="auth-screen">
+        <div className="auth-card auth-card--color">
+          <div className="auth-card__brand">
+            <span className="auth-card__logo">🎨</span>
+            <h1 className="auth-card__title">Make it yours</h1>
+            <p className="auth-card__tagline">Pick a color that feels right for your journey.</p>
+          </div>
+
+          <ColorPicker
+            selected={themeColor}
+            onChange={handleColorChange}
+            label="Your theme color"
+          />
+
+          {error && <p className="auth-form__error">{error}</p>}
+
+          <div className="auth-color-actions">
+            <button
+              className="btn btn--primary auth-form__submit"
+              onClick={handleColorSubmit}
+              disabled={loading}
+            >
+              {loading ? 'Creating your account...' : "Let's go →"}
+            </button>
+            <button
+              className="btn btn--ghost"
+              onClick={() => setStep('form')}
+              disabled={loading}
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Main auth form ───────────────────────────────────────────
   return (
     <div className="auth-screen">
       <div className="auth-card">
@@ -58,24 +124,22 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSignIn, onSignUp }) =>
         <div className="auth-card__tabs">
           <button
             className={`auth-tab ${mode === 'signin' ? 'auth-tab--active' : ''}`}
-            onClick={() => { setMode('signin'); setError(null) }}
+            onClick={() => { setMode('signin'); setError(null); setStep('form') }}
           >
             Sign in
           </button>
           <button
             className={`auth-tab ${mode === 'signup' ? 'auth-tab--active' : ''}`}
-            onClick={() => { setMode('signup'); setError(null) }}
+            onClick={() => { setMode('signup'); setError(null); setStep('form') }}
           >
             Create account
           </button>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleFormSubmit}>
           {mode === 'signup' && (
             <div className="auth-form__field">
-              <label className="form-label" htmlFor="username">
-                Display name
-              </label>
+              <label className="form-label" htmlFor="username">Display name</label>
               <input
                 id="username"
                 className="input"
@@ -121,7 +185,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSignIn, onSignUp }) =>
                 When did your recovery start?
               </label>
               <p className="auth-form__hint">
-                This is just for your own tracking — you can change it later.
+                Just for your own tracking — you can change it later.
               </p>
               <input
                 id="recovery-start"
@@ -142,7 +206,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSignIn, onSignUp }) =>
               ? 'Please wait...'
               : mode === 'signin'
               ? 'Sign in'
-              : 'Create account'}
+              : 'Next →'}
           </button>
         </form>
       </div>

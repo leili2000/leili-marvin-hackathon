@@ -15,6 +15,7 @@ export type DbProfile = {
   username: string
   tracking_mode: 'daily_checkin' | 'auto_increment'
   recovery_start_date: string
+  theme_color: string
   created_at: string
 }
 

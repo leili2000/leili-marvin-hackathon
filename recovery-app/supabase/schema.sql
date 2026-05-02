@@ -13,6 +13,7 @@ create table profiles (
   tracking_mode text not null default 'auto_increment'
     check (tracking_mode in ('daily_checkin', 'auto_increment')),
   recovery_start_date date not null default current_date,
+  theme_color text not null default 'forest',
   created_at timestamptz not null default now()
 );
 

@@ -29,6 +29,42 @@
   background: var(--color-bg);
 }
 
+/* ─── Dark mode ─────────────────────────────────────────────────── */
+[data-theme='dark'] {
+  --color-bg: #0f1117;
+  --color-surface: #1a1d27;
+  --color-border: #2a2d3a;
+  --color-text: #e8e8e8;
+  --color-text-muted: #8b8fa8;
+  --color-milestone: #1a2a1a;
+  --color-milestone-border: #4a7a4a;
+  --color-happy: #2a2510;
+  --color-happy-border: #8a7a30;
+  --color-vent: #1a1d30;
+  --color-vent-border: #4a5080;
+  --color-danger: #e57373;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+[data-theme='dark'] body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .auth-form__error {
+  background: rgba(229, 115, 115, 0.15);
+}
+
+[data-theme='dark'] .barrier__redirect {
+  background: #2a2510;
+  border-color: #8a7a30;
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .calendar-day--future { color: #3a3d4a; }
+
 body { min-height: 100vh; }
 
 /* ─── Layout ────────────────────────────────────────────────────── */
@@ -521,6 +557,24 @@ body { min-height: 100vh; }
 /* ─── App header right ──────────────────────────────────────────── */
 .app-header__right { display: flex; align-items: center; gap: 10px; }
 
+/* ─── Theme toggle ──────────────────────────────────────────────── */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--color-surface);
+  border-color: var(--color-primary);
+  transform: scale(1.08);
+}
+
 /* ─── Loading / Error states ────────────────────────────────────── */
 .app-loading {
   min-height: 100vh; display: flex; flex-direction: column;
@@ -532,4 +586,77 @@ body { min-height: 100vh; }
 .error-state {
   padding: 14px; border-radius: var(--radius);
   background: #fdecea; color: var(--color-danger); font-size: 14px;
+}
+
+/* ─── Color Picker ──────────────────────────────────────────────── */
+.color-picker {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.color-picker__label {
+  font-size: 14px; font-weight: 500; color: var(--color-text);
+}
+.color-picker__grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+}
+.color-swatch {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--swatch-color);
+  border: 3px solid transparent;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.color-swatch:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.color-swatch--selected {
+  border-color: #fff;
+  outline: 3px solid var(--swatch-color);
+  outline-offset: 2px;
+  transform: scale(1.1);
+}
+.color-swatch__check {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.color-picker__selected-label {
+  font-size: 13px; color: var(--color-text-muted);
+  text-align: center; font-weight: 500;
+  min-height: 18px;
+}
+
+/* ─── Auth color step ───────────────────────────────────────────── */
+.auth-card--color {
+  gap: 24px;
+}
+.auth-color-actions {
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+/* ─── Settings section ──────────────────────────────────────────── */
+.settings-section {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); padding: 16px;
+}
+.stats-tab__settings { display: flex; flex-direction: column; gap: 16px; }
+
+.theme-toggle-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--color-text);
+  transition: all 0.15s;
+  margin-top: 8px;
+}
+.theme-toggle-row:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
 }

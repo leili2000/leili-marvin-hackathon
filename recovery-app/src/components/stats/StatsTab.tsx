@@ -1,18 +1,22 @@
 import React, { useState } from 'react'
 import type { TrackingMode } from '../../types'
 import { useStats } from '../../hooks/useStats'
+import { useTheme } from '../../hooks/useTheme'
 import { CalendarWidget } from './CalendarWidget'
 import { DailyCheckIn } from './DailyCheckIn'
 import { AutoIncrementPrompt } from './AutoIncrementPrompt'
 import { PatternInsights } from './PatternInsights'
 import { TrackingModeSelector } from './TrackingModeSelector'
+import { ColorPicker, applyThemeColor } from '../ColorPicker'
 
 interface StatsTabProps {
   userId: string
   username: string
   trackingMode: TrackingMode
   recoveryStartDate: string
+  themeColor: string
   onTrackingModeChange: (mode: TrackingMode) => void
+  onThemeColorChange: (colorId: string) => void
 }
 
 type StatsView = 'overview' | 'calendar' | 'patterns' | 'settings'
@@ -22,10 +26,13 @@ export const StatsTab: React.FC<StatsTabProps> = ({
   username,
   trackingMode,
   recoveryStartDate,
+  themeColor,
   onTrackingModeChange,
+  onThemeColorChange,
 }) => {
   const { checkIns, patterns, loading, saveCheckIn, updateDay, getCurrentStreak } =
     useStats(userId)
+  const { mode: themeMode, toggle: toggleTheme } = useTheme()
   const [view, setView] = useState<StatsView>('overview')
   const [lastPromptDate, setLastPromptDate] = useState<string | null>(null)
 
@@ -129,6 +136,26 @@ export const StatsTab: React.FC<StatsTabProps> = ({
       {view === 'settings' && (
         <div className="stats-tab__settings">
           <TrackingModeSelector current={trackingMode} onChange={onTrackingModeChange} />
+
+          <div className="settings-section">
+            <ColorPicker
+              selected={themeColor}
+              onChange={(colorId) => {
+                applyThemeColor(colorId)
+                onThemeColorChange(colorId)
+              }}
+              label="Theme color"
+            />
+          </div>
+
+          <div className="settings-section">
+            <p className="color-picker__label">Appearance</p>
+            <button className="theme-toggle-row" onClick={toggleTheme}>
+              <span>{themeMode === 'light' ? '🌙' : '☀️'}</span>
+              <span>{themeMode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}</span>
+            </button>
+          </div>
+
           <div className="settings-info">
             <p><strong>Name:</strong> {username}</p>
             <p>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import type { User as AppUser, TrackingMode } from '../types'
+import { applyThemeColor } from '../components/ColorPicker'
 
 export type AuthState =
   | { status: 'loading' }
@@ -58,6 +59,8 @@ export function useAuth() {
     }
 
     if (profile) {
+      const themeColor = profile.theme_color ?? 'forest'
+      applyThemeColor(themeColor)
       setAuthState({
         status: 'authenticated',
         session,
@@ -66,6 +69,7 @@ export function useAuth() {
           username: profile.username,
           trackingMode: profile.tracking_mode as TrackingMode,
           recoveryStartDate: profile.recovery_start_date,
+          themeColor,
         },
       })
     } else {
@@ -77,18 +81,19 @@ export function useAuth() {
     email: string,
     password: string,
     username: string,
-    recoveryStartDate: string
+    recoveryStartDate: string,
+    themeColor: string = 'forest'
   ) => {
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) throw error
     if (!data.user) throw new Error('Sign up failed')
 
-    // Create profile row
     const { error: profileError } = await supabase.from('profiles').insert({
       id: data.user.id,
       username,
       tracking_mode: 'auto_increment',
       recovery_start_date: recoveryStartDate,
+      theme_color: themeColor,
     })
     if (profileError) throw profileError
   }
@@ -109,12 +114,25 @@ export function useAuth() {
       .eq('id', userId)
     if (error) throw error
 
-    // Optimistically update local state
     setAuthState((prev) => {
       if (prev.status !== 'authenticated') return prev
       return { ...prev, user: { ...prev.user, trackingMode: mode } }
     })
   }
 
-  return { authState, signUp, signIn, signOut, updateTrackingMode }
+  const updateThemeColor = async (userId: string, colorId: string) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ theme_color: colorId })
+      .eq('id', userId)
+    if (error) throw error
+
+    applyThemeColor(colorId)
+    setAuthState((prev) => {
+      if (prev.status !== 'authenticated') return prev
+      return { ...prev, user: { ...prev.user, themeColor: colorId } }
+    })
+  }
+
+  return { authState, signUp, signIn, signOut, updateTrackingMode, updateThemeColor }
 }

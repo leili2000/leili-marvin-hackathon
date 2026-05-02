@@ -7,6 +7,7 @@ export interface User {
   username: string
   trackingMode: TrackingMode
   recoveryStartDate: string
+  themeColor: string
 }
 
 export interface Post {
