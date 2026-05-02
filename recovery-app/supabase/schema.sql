@@ -94,13 +94,19 @@ create policy "Users manage their own checkins"
   on checkins for all using (auth.uid() = user_id);
 
 -- ─── Relapse Patterns ────────────────────────────────────────────
--- Populated by AI analysis of relapse_reason text from checkins
+-- Populated by AI analysis of check-in notes via Puter.js
+-- side = 'regression'  → triggers that lead to relapse
+-- side = 'protective'  → habits that help stay clean
 create table relapse_patterns (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade not null,
   pattern_type text not null,
   description text not null,
   frequency int not null default 1,
+  tags text[] default '{}',
+  last_seen date,
+  side text not null default 'regression'
+    check (side in ('regression', 'protective')),
   created_at timestamptz not null default now()
 );
 

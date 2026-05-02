@@ -43,6 +43,9 @@ export interface RelapsePattern {
   patternType: string
   description: string
   frequency: number
+  tags?: string[]
+  lastSeen?: string | null
+  side?: 'regression' | 'protective'
 }
 
 export interface CalendarDay {
