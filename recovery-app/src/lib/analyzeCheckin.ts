@@ -1,8 +1,8 @@
 /**
  * analyzeCheckin.ts
  *
- * Uses the Puter REST API directly (no CDN, no npm package).
- * Free tier — no API key required for basic usage.
+ * Uses OpenRouter (free tier) to analyze check-in notes.
+ * Get a free key at https://openrouter.ai — no credit card needed.
  *
  * Relapse entry  → extracts triggers  ("things that make you regress")
  * Clean entry    → extracts habits    ("things that help you stay clean")
@@ -10,7 +10,9 @@
 
 import { supabase } from './supabase'
 
-const PUTER_API_URL = 'https://api.puter.com/drivers/call'
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+// Free model — no credits needed
+const MODEL = 'mistralai/mistral-7b-instruct:free'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,10 +31,10 @@ function buildPrompt(status: 'clean' | 'relapse', text: string): string {
 
 "${text}"
 
-Extract the key triggers. Reply with ONLY this JSON (no explanation, no markdown):
+Reply with ONLY this JSON (no explanation, no markdown):
 {
   "side": "regression",
-  "patternType": "one short label like: stress, loneliness, environment, grief, conflict, exhaustion, celebration",
+  "patternType": "one short label e.g. stress, loneliness, environment, grief, conflict, exhaustion",
   "tags": ["2-4 short trigger words"],
   "summary": "One plain sentence describing what led to the relapse"
 }`
@@ -42,10 +44,10 @@ Extract the key triggers. Reply with ONLY this JSON (no explanation, no markdown
 
 "${text}"
 
-Extract the key protective habits or factors. Reply with ONLY this JSON (no explanation, no markdown):
+Reply with ONLY this JSON (no explanation, no markdown):
 {
   "side": "protective",
-  "patternType": "one short label like: routine, support, exercise, mindfulness, purpose, journaling, self-care",
+  "patternType": "one short label e.g. routine, support, exercise, mindfulness, purpose, journaling",
   "tags": ["2-4 short habit words"],
   "summary": "One plain sentence describing what helped them stay clean"
 }`
@@ -54,30 +56,34 @@ Extract the key protective habits or factors. Reply with ONLY this JSON (no expl
 // ─── API call ─────────────────────────────────────────────────────────────────
 
 async function callAI(prompt: string): Promise<AnalysisResult | null> {
+  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY
+  if (!apiKey) {
+    console.warn('[analyzeCheckin] No VITE_OPENROUTER_API_KEY — skipping AI analysis')
+    return null
+  }
+
   try {
-    const res = await fetch(PUTER_API_URL, {
+    const res = await fetch(OPENROUTER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': window.location.origin,
+      },
       body: JSON.stringify({
-        interface: 'puter-chat-completion',
-        driver: 'openai-completion',
-        test_mode: false,
-        call: {
-          messages: [{ role: 'user', content: prompt }],
-        },
+        model: MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
       }),
     })
 
     if (!res.ok) {
-      console.error('[analyzeCheckin] API error:', res.status)
+      console.error('[analyzeCheckin] OpenRouter error:', res.status, await res.text())
       return null
     }
 
     const json = await res.json()
-    const raw: string = json?.result?.message?.content
-      ?? json?.result?.choices?.[0]?.message?.content
-      ?? ''
-
+    const raw: string = json?.choices?.[0]?.message?.content ?? ''
     if (!raw) return null
 
     const cleaned = raw.replace(/```json|```/g, '').trim()
@@ -135,7 +141,7 @@ async function upsertPattern(
 
 /**
  * Fire-and-forget. Call after saving a check-in.
- * Skips silently if text is too short or AI is unavailable.
+ * Skips silently if text is too short or API key is missing.
  */
 export async function analyzeCheckin(
   userId: string,

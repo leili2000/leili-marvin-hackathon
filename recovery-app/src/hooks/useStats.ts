@@ -117,11 +117,12 @@ export function useStats(userId: string | null) {
     })
 
     // Fire-and-forget AI analysis — won't block the UI
-    // Analyze relapse_reason for relapses, note for clean days
+    // For relapses: analyze the relapse_reason
+    // For clean days: analyze the note (what helped)
     const textToAnalyze = status === 'relapse' ? relapseReason : note
-    if (textToAnalyze && !data.ai_processed) {
+    if (textToAnalyze && textToAnalyze.trim().length >= 10) {
       analyzeCheckin(userId, data.id, status, textToAnalyze)
-        .then(() => fetchPatterns()) // refresh patterns after analysis
+        .then(() => fetchPatterns())
         .catch((err) => console.error('[useStats] AI analysis failed silently:', err))
     }
 

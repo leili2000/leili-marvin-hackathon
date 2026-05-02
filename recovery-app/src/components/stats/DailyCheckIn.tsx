@@ -59,7 +59,7 @@ export const DailyCheckIn: React.FC<DailyCheckInProps> = ({ todayCheckIn, onSubm
     <div className="daily-checkin">
       <h3 className="daily-checkin__title">How did today go?</h3>
       <p className="daily-checkin__subtitle">
-        {new Date('2026-05-02').toLocaleDateString('en-US', {
+        {new Date().toLocaleDateString('en-US', {
           weekday: 'long', month: 'long', day: 'numeric',
         })}
       </p>
@@ -94,7 +94,7 @@ export const DailyCheckIn: React.FC<DailyCheckInProps> = ({ todayCheckIn, onSubm
             rows={3}
             placeholder={
               status === 'clean'
-                ? 'What helped today? What felt good?'
+                ? 'What helped you stay clean today? (e.g. went for a run, called my sponsor, kept busy) — we use this to find your patterns'
                 : 'What was going on? No judgment — just for you.'
             }
             value={note}
