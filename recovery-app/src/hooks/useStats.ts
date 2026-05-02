@@ -120,10 +120,16 @@ export function useStats(userId: string | null) {
     // For relapses: analyze the relapse_reason
     // For clean days: analyze the note (what helped)
     const textToAnalyze = status === 'relapse' ? relapseReason : note
-    if (textToAnalyze && textToAnalyze.trim().length >= 10) {
+    if (textToAnalyze && textToAnalyze.trim().length >= 5) {
+      console.log('[useStats] Running pattern analysis for:', status, textToAnalyze)
       analyzeCheckin(userId, data.id, status, textToAnalyze)
-        .then(() => fetchPatterns())
-        .catch((err) => console.error('[useStats] AI analysis failed silently:', err))
+        .then(() => {
+          console.log('[useStats] Pattern analysis done, refreshing patterns')
+          fetchPatterns()
+        })
+        .catch((err) => console.error('[useStats] Analysis error:', err))
+    } else {
+      console.log('[useStats] Skipping analysis — no text or too short:', textToAnalyze)
     }
 
     return saved

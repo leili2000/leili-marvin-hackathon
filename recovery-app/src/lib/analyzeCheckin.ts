@@ -1,18 +1,14 @@
 /**
  * analyzeCheckin.ts
  *
- * Uses OpenRouter (free tier) to analyze check-in notes.
- * Get a free key at https://openrouter.ai — no credit card needed.
+ * Keyword-based pattern classifier — no API needed, works offline.
+ * Swap classify() for an LLM call later when ready.
  *
  * Relapse entry  → extracts triggers  ("things that make you regress")
  * Clean entry    → extracts habits    ("things that help you stay clean")
  */
 
 import { supabase } from './supabase'
-
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
-// Free model — no credits needed
-const MODEL = 'mistralai/mistral-7b-instruct:free'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,74 +19,80 @@ interface AnalysisResult {
   summary: string
 }
 
-// ─── Prompts ──────────────────────────────────────────────────────────────────
+// ─── Keyword maps ─────────────────────────────────────────────────────────────
 
-function buildPrompt(status: 'clean' | 'relapse', text: string): string {
-  if (status === 'relapse') {
-    return `You are a compassionate recovery coach. Someone in addiction recovery wrote this about why they relapsed:
-
-"${text}"
-
-Reply with ONLY this JSON (no explanation, no markdown):
-{
-  "side": "regression",
-  "patternType": "one short label e.g. stress, loneliness, environment, grief, conflict, exhaustion",
-  "tags": ["2-4 short trigger words"],
-  "summary": "One plain sentence describing what led to the relapse"
-}`
-  }
-
-  return `You are a compassionate recovery coach. Someone in addiction recovery wrote this about what helped them stay clean today:
-
-"${text}"
-
-Reply with ONLY this JSON (no explanation, no markdown):
-{
-  "side": "protective",
-  "patternType": "one short label e.g. routine, support, exercise, mindfulness, purpose, journaling",
-  "tags": ["2-4 short habit words"],
-  "summary": "One plain sentence describing what helped them stay clean"
-}`
+const REGRESSION_PATTERNS: Record<string, string[]> = {
+  stress:      ['stress', 'stressed', 'overwhelm', 'pressure', 'deadline', 'work', 'too much', 'burnout'],
+  loneliness:  ['alone', 'lonely', 'isolated', 'no one', 'invisible', 'disconnected', 'by myself'],
+  grief:       ['grief', 'loss', 'died', 'death', 'anniversary', 'miss', 'missing', 'sad', 'mourning'],
+  conflict:    ['argument', 'fight', 'conflict', 'angry', 'anger', 'yelled', 'partner', 'family', 'tension'],
+  environment: ['old friend', 'using friend', 'place', 'neighborhood', 'bar', 'party', 'smell', 'saw'],
+  exhaustion:  ['tired', 'exhausted', 'sleep', 'insomnia', 'no energy', 'drained', "couldn't sleep"],
+  celebration: ['celebrate', 'happy', 'good news', 'promotion', 'birthday', 'wedding', 'event'],
+  boredom:     ['bored', 'boredom', 'nothing to do', 'empty', 'numb', 'restless'],
 }
 
-// ─── API call ─────────────────────────────────────────────────────────────────
+const PROTECTIVE_PATTERNS: Record<string, string[]> = {
+  support:     ['sponsor', 'meeting', 'called', 'talked', 'friend', 'family', 'group', 'reached out', 'connected'],
+  exercise:    ['run', 'ran', 'walk', 'walked', 'gym', 'workout', 'exercise', 'bike', 'swim', 'yoga'],
+  routine:     ['routine', 'schedule', 'morning', 'structure', 'plan', 'kept busy', 'stayed busy'],
+  mindfulness: ['meditat', 'breath', 'pause', 'journal', 'wrote', 'reflect', 'present', 'calm', 'grounded'],
+  purpose:     ['kids', 'family', 'goal', 'reason', 'worth it', 'future', 'motivated'],
+  self_care:   ['sleep', 'rest', 'ate', 'food', 'shower', 'outside', 'nature', 'music', 'read'],
+  avoidance:   ['avoided', 'stayed away', 'left', "didn't go", 'said no', 'removed myself'],
+}
 
-async function callAI(prompt: string): Promise<AnalysisResult | null> {
-  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY
-  if (!apiKey) {
-    console.warn('[analyzeCheckin] No VITE_OPENROUTER_API_KEY — skipping AI analysis')
-    return null
+const SUMMARIES: Record<string, string> = {
+  // regression
+  stress:      'Stress and pressure appear to have been a factor.',
+  loneliness:  'Feelings of isolation and loneliness were present.',
+  grief:       'Grief or unprocessed loss played a role.',
+  conflict:    'Relationship tension or conflict was a trigger.',
+  environment: 'Environmental cues or people from the past were involved.',
+  exhaustion:  'Physical exhaustion lowered resilience.',
+  celebration: 'A positive event lowered the guard.',
+  boredom:     'Boredom or emotional emptiness was a factor.',
+  // protective
+  support:     'Reaching out to others helped stay grounded.',
+  exercise:    'Physical activity provided a healthy outlet.',
+  routine:     'Having structure and routine made a difference.',
+  mindfulness: 'Mindfulness or reflection helped stay present.',
+  purpose:     'A sense of purpose and meaning provided motivation.',
+  self_care:   'Taking care of basic needs supported recovery.',
+  avoidance:   'Actively avoiding triggers helped stay clean.',
+}
+
+// ─── Classifier ───────────────────────────────────────────────────────────────
+
+function classify(status: 'clean' | 'relapse', text: string): AnalysisResult {
+  const lower = text.toLowerCase()
+  const patterns = status === 'relapse' ? REGRESSION_PATTERNS : PROTECTIVE_PATTERNS
+  const side: 'regression' | 'protective' = status === 'relapse' ? 'regression' : 'protective'
+
+  let bestPattern = ''
+  let bestScore = 0
+  const matchedTags: string[] = []
+
+  for (const [pattern, keywords] of Object.entries(patterns)) {
+    const matches = keywords.filter((kw) => lower.includes(kw))
+    if (matches.length > bestScore) {
+      bestScore = matches.length
+      bestPattern = pattern
+    }
+    if (matches.length > 0) matchedTags.push(...matches.slice(0, 2))
   }
 
-  try {
-    const res = await fetch(OPENROUTER_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': window.location.origin,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-      }),
-    })
+  if (!bestPattern) {
+    bestPattern = status === 'relapse' ? 'stress' : 'self_care'
+  }
 
-    if (!res.ok) {
-      console.error('[analyzeCheckin] OpenRouter error:', res.status, await res.text())
-      return null
-    }
+  const tags = [...new Set(matchedTags)].slice(0, 4)
 
-    const json = await res.json()
-    const raw: string = json?.choices?.[0]?.message?.content ?? ''
-    if (!raw) return null
-
-    const cleaned = raw.replace(/```json|```/g, '').trim()
-    return JSON.parse(cleaned) as AnalysisResult
-  } catch (err) {
-    console.error('[analyzeCheckin] AI call failed:', err)
-    return null
+  return {
+    side,
+    patternType: bestPattern,
+    tags: tags.length > 0 ? tags : [bestPattern],
+    summary: SUMMARIES[bestPattern] ?? `${bestPattern} was identified as a key factor.`,
   }
 }
 
@@ -140,8 +142,8 @@ async function upsertPattern(
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 /**
- * Fire-and-forget. Call after saving a check-in.
- * Skips silently if text is too short or API key is missing.
+ * Analyzes a check-in and upserts the pattern into Supabase.
+ * Uses local keyword matching — swap classify() for an LLM call when ready.
  */
 export async function analyzeCheckin(
   userId: string,
@@ -150,11 +152,8 @@ export async function analyzeCheckin(
   text: string
 ): Promise<void> {
   const trimmed = text.trim()
-  if (trimmed.length < 10) return
+  if (trimmed.length < 5) return
 
-  const prompt = buildPrompt(status, trimmed)
-  const result = await callAI(prompt)
-  if (!result) return
-
+  const result = classify(status, trimmed)
   await upsertPattern(userId, checkinId, result)
 }
