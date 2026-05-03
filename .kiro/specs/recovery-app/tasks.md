@@ -208,35 +208,35 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Persist mode change to profiles table and trigger immediate re-render
     - _Requirements: 3.3_
 
-- [ ] 8. Checkpoint — Ensure Stats tab renders and functions correctly
+- [x] 8. Checkpoint — Ensure Stats tab renders and functions correctly
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Implement Social tab components
-  - [~] 9.1 Implement SocialTab with PostFilterBar
+- [x] 9. Implement Social tab components
+  - [x] 9.1 Implement SocialTab with PostFilterBar
     - Create `src/components/social/SocialTab.tsx` with filter bar (All, Milestones, Good Things, Vent Posts)
     - Gate vent post filter behind VentBarrier completion
     - _Requirements: 13.3, 13.4_
 
-  - [~] 9.2 Implement PostFeed and PostCard components
+  - [x] 9.2 Implement PostFeed and PostCard components
     - Create `src/components/social/PostFeed.tsx` displaying posts ordered by created_at desc, limit 50
     - Create `src/components/social/PostCard.tsx` with post content, anonymous name, timestamp, and inline ReplyBox
     - Show reply count only to post owner
     - Display "Couldn't load posts" with retry on fetch failure
     - _Requirements: 13.2, 13.5, 14.2_
 
-  - [~] 9.3 Implement NewPostForm component
+  - [x] 9.3 Implement NewPostForm component
     - Create `src/components/social/NewPostForm.tsx` with post type selection and content input
     - Require VentBarrier completion before allowing vent post creation
     - Display inline error on creation failure, preserve draft
     - _Requirements: 13.1, 13.4, 13.6_
 
-  - [~] 9.4 Implement VentBarrier component
+  - [x] 9.4 Implement VentBarrier component
     - Create `src/components/social/VentBarrier.tsx` using the `transitionBarrier` state machine
     - Render step-by-step UI: intro, check1, check2, check3, ready
     - Handle decline paths (return to idle), answer recording, and 3-post reset
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8_
 
-  - [~] 9.5 Implement InboxPanel and ReplyBox components
+  - [x] 9.5 Implement InboxPanel and ReplyBox components
     - Create `src/components/social/InboxPanel.tsx` showing replies where current user is recipient, with sender anonymous name, content, and timestamp
     - Create `src/components/social/ReplyBox.tsx` as inline reply form on PostCard
     - Display "Couldn't send reply — try again" on failure, preserve draft
