@@ -3,26 +3,12 @@ import type {
   RelapseWordFlag,
   HappyItem,
   RelapseRiskAssessment,
-  NudgeAction,
 } from '../types/index'
 import { predictNumerical } from './predictRelapse'
 import { detectWordRisk, SCAN_DAYS } from './analyzeCheckin'
-// TODO: Replace with import from './nudge' once task 3.11 is done
-// import { buildNudgeAction } from './nudge'
+import { buildNudgeAction } from './nudge'
 
 const MS_PER_DAY = 86_400_000
-
-/**
- * Temporary placeholder for buildNudgeAction until task 3.11 creates ./nudge.ts.
- * Always returns null for now.
- */
-function buildNudgeAction(
-  _risk: 'low' | 'medium' | 'high',
-  _happyItems: HappyItem[]
-): NudgeAction | null {
-  // TODO: Replace this placeholder with the real implementation from './nudge'
-  return null
-}
 
 /**
  * assessRelapseRisk
@@ -38,7 +24,7 @@ function buildNudgeAction(
  * Postconditions:
  *   - overallRisk reflects the highest signal from either method
  *   - suggestedAction is null when overallRisk = 'none'
- *   - suggestedAction is non-null when overallRisk >= 'medium' (once nudge is wired)
+ *   - suggestedAction is non-null when overallRisk >= 'medium'
  */
 export function assessRelapseRisk(
   checkIns: CheckIn[],

@@ -83,7 +83,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - **Property 16: High word-signal count forces high risk** — wordSignals.length ≥ 3 implies overallRisk = 'high'
     - **Validates: Requirements 10.4**
 
-  - [~] 3.11 Implement `buildNudgeAction` function
+  - [x] 3.11 Implement `buildNudgeAction` function
     - Create `src/lib/nudge.ts` with the `buildNudgeAction` function
     - Implement random suppression (40% for non-high risk), low-energy item selection for low risk, mixed suggestions for medium risk, always-suggest for high risk
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6_
