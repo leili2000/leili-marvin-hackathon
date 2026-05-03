@@ -263,7 +263,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Ensure plain HTML/CSS only — no component library
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 12. Checkpoint — Ensure full app renders end-to-end
+- [x] 12. Checkpoint — Ensure full app renders end-to-end
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 13. Write remaining unit and integration tests
@@ -295,7 +295,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Test inline error display for invalid credentials
     - _Requirements: 1.3, 1.4_
 
-- [ ] 14. Final checkpoint — Ensure all tests pass
+- [x] 14. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
