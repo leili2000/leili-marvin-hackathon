@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { TrackingMode, DayStatus } from '../../types/index'
+import { supabase as supabaseClient } from '../../lib/supabase'
 import { useStats } from '../../hooks/useStats'
 import { DailyCheckIn } from './DailyCheckIn'
 import { AutoIncrementPrompt } from './AutoIncrementPrompt'
@@ -97,6 +98,11 @@ export function StatsTab({
 
   const handleDaySelect = (date: string) => {
     setSelectedDay(date)
+  }
+
+  const handleStartDateChange = async (newDate: string) => {
+    await supabaseClient.from('profiles').update({ recovery_start_date: newDate }).eq('id', userId)
+    window.location.reload()
   }
 
   const handleDayDetailSave = async (status: 'clean' | 'relapse', note: string, relapseReason: string) => {
@@ -239,6 +245,7 @@ export function StatsTab({
             recoveryStartDate={recoveryStartDate}
             onDayUpdate={handleDayUpdate}
             onDaySelect={handleDaySelect}
+            onStartDateChange={handleStartDateChange}
           />
         </div>
       )}

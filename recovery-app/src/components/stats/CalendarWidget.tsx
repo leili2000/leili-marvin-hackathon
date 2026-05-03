@@ -6,6 +6,7 @@ interface CalendarWidgetProps {
   recoveryStartDate: string
   onDayUpdate: (date: string, status: DayStatus) => void
   onDaySelect: (date: string) => void
+  onStartDateChange?: (newDate: string) => void
 }
 
 function pad(n: number): string {
@@ -31,7 +32,7 @@ const MONTH_NAMES = [
 
 const DAY_HEADERS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDaySelect }: CalendarWidgetProps) {
+export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDaySelect, onStartDateChange }: CalendarWidgetProps) {
   const today = new Date()
   const todayStr = toDateStr(today)
   const [year, setYear] = useState(today.getFullYear())
@@ -307,6 +308,25 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
               >
                 No, go back
               </button>
+              {onStartDateChange && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onStartDateChange(startDatePrompt!)
+                    setStartDatePrompt(null)
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    background: 'var(--color-primary, #4f8a6e)',
+                    color: 'var(--color-primary-contrast, #fff)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Yes, update start date
+                </button>
+              )}
             </div>
           </div>
         </div>

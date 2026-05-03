@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import type { AppUser } from '../types/index'
-import type { Session } from '@supabase/supabase-js'
+
+const SESSION_KEY = 'recovery_app_user_id'
 
 interface UseAuthReturn {
   user: AppUser | null
   loading: boolean
   error: string | null
-  signIn: (email: string, password: string) => Promise<void>
+  signIn: (username: string, password: string) => Promise<void>
   signUp: (
-    email: string,
-    password: string,
     username: string,
+    password: string,
     recoveryStartDate: string,
     favoriteColor: string
   ) => Promise<void>
@@ -21,7 +21,7 @@ interface UseAuthReturn {
 async function fetchProfile(userId: string): Promise<AppUser | null> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, username, tracking_mode, recovery_start_date, favorite_color')
     .eq('id', userId)
     .single()
 
@@ -41,126 +41,111 @@ export function useAuth(): UseAuthReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Restore session from localStorage on mount
   useEffect(() => {
-    let mounted = true
-
-    // Timeout fallback — if getSession hangs for more than 5 seconds, stop loading
-    const timeout = setTimeout(() => {
-      if (mounted && loading) {
-        setLoading(false)
-      }
-    }, 5000)
-
-    // Restore session on mount
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!mounted) return
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id)
-        if (mounted) setUser(profile)
-      }
-      if (mounted) setLoading(false)
-    }).catch(() => {
-      if (mounted) setLoading(false)
-    })
-
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      async (_event: string, session: Session | null) => {
-        if (!mounted) return
-        if (session?.user) {
-          const profile = await fetchProfile(session.user.id)
-          if (mounted) setUser(profile)
-        } else {
-          if (mounted) setUser(null)
-        }
-      }
-    )
-
-    return () => {
-      mounted = false
-      clearTimeout(timeout)
-      subscription.unsubscribe()
+    const savedId = localStorage.getItem(SESSION_KEY)
+    if (!savedId) {
+      setLoading(false)
+      return
     }
+
+    fetchProfile(savedId).then((profile) => {
+      if (profile) {
+        setUser(profile)
+      } else {
+        localStorage.removeItem(SESSION_KEY)
+      }
+      setLoading(false)
+    }).catch(() => {
+      localStorage.removeItem(SESSION_KEY)
+      setLoading(false)
+    })
   }, [])
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = useCallback(async (username: string, password: string) => {
     setError(null)
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+
+    const { data, error: rpcError } = await supabase.rpc('signin', {
+      p_username: username,
+      p_password: password,
     })
-    if (signInError) {
-      setError(signInError.message)
+
+    if (rpcError) {
+      setError('Something went wrong. Please try again.')
+      return
     }
+
+    if (!data) {
+      setError('Invalid username or password')
+      return
+    }
+
+    const userId = data as string
+    const profile = await fetchProfile(userId)
+
+    if (!profile) {
+      setError('Could not load profile')
+      return
+    }
+
+    localStorage.setItem(SESSION_KEY, userId)
+    setUser(profile)
   }, [])
 
   const signUp = useCallback(
     async (
-      email: string,
-      password: string,
       username: string,
+      password: string,
       recoveryStartDate: string,
       favoriteColor: string
     ) => {
       setError(null)
 
-      const { data: authData, error: signUpError } =
-        await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              username,
-              recovery_start_date: recoveryStartDate,
-              favorite_color: favoriteColor,
-            },
-          },
-        })
+      console.log('signUp called with:', { username, recoveryStartDate, favoriteColor })
 
-      if (signUpError) {
-        console.error('Supabase signUp error:', signUpError)
-        setError(signUpError.message)
-        return
-      }
+      const { data, error: rpcError } = await supabase.rpc('signup', {
+        p_username: username,
+        p_password: password,
+        p_recovery_start_date: recoveryStartDate,
+        p_favorite_color: favoriteColor,
+      })
 
-      // If no session returned, email confirmation is likely required
-      if (!authData.session) {
-        console.warn('SignUp succeeded but no session — email confirmation may be enabled')
-        setError('Account created! Please check your email to confirm, or disable email confirmation in Supabase settings.')
-        return
-      }
+      console.log('signUp RPC result:', { data, error: rpcError })
 
-      // Explicitly insert profile row for reliability (the trigger may also fire)
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert(
-            {
-              id: authData.user.id,
-              username,
-              recovery_start_date: recoveryStartDate,
-              favorite_color: favoriteColor,
-              tracking_mode: 'auto_increment',
-            },
-            { onConflict: 'id' }
-          )
-
-        if (profileError) {
-          setError(profileError.message)
+      if (rpcError) {
+        if (rpcError.message.includes('duplicate') || rpcError.message.includes('unique')) {
+          setError('Username already taken')
+        } else {
+          setError(rpcError.message)
         }
+        return
       }
+
+      if (!data) {
+        setError('Signup failed — no user ID returned')
+        return
+      }
+
+      const userId = data as string
+      console.log('signUp userId:', userId)
+      const profile = await fetchProfile(userId)
+      console.log('signUp profile:', profile)
+
+      if (!profile) {
+        setError('Account created but could not load profile. Try signing in.')
+        return
+      }
+
+      localStorage.setItem(SESSION_KEY, userId)
+      setUser(profile)
     },
     []
   )
 
   const signOut = useCallback(async () => {
+    localStorage.removeItem(SESSION_KEY)
+    setUser(null)
     setError(null)
-    const { error: signOutError } = await supabase.auth.signOut()
-    if (signOutError) {
-      setError(signOutError.message)
-    }
   }, [])
 
   return { user, loading, error, signIn, signUp, signOut }

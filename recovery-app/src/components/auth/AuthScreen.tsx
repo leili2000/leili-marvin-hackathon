@@ -3,11 +3,10 @@ import { ColorPicker } from './ColorPicker'
 import { isValidHex } from '../../lib/theme'
 
 interface AuthScreenProps {
-  onSignIn: (email: string, password: string) => Promise<void>
+  onSignIn: (username: string, password: string) => Promise<void>
   onSignUp: (
-    email: string,
-    password: string,
     username: string,
+    password: string,
     recoveryStartDate: string,
     favoriteColor: string
   ) => Promise<void>
@@ -25,7 +24,7 @@ function SignInForm({
   onSignIn: AuthScreenProps['onSignIn']
   error: string | null
 }) {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -33,7 +32,7 @@ function SignInForm({
     e.preventDefault()
     setSubmitting(true)
     try {
-      await onSignIn(email, password)
+      await onSignIn(username, password)
     } finally {
       setSubmitting(false)
     }
@@ -50,12 +49,12 @@ function SignInForm({
       )}
 
       <div>
-        <label htmlFor="signin-email">Email</label>
+        <label htmlFor="signin-username">Username</label>
         <input
-          id="signin-email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="signin-username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
         />
@@ -87,9 +86,8 @@ function SignUpForm({
   onSignUp: AuthScreenProps['onSignUp']
   error: string | null
 }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [recoveryStartDate, setRecoveryStartDate] = useState(todayStr())
   const [favoriteColor, setFavoriteColor] = useState('#4f8a6e')
   const [colorError, setColorError] = useState<string | null>(null)
@@ -106,7 +104,7 @@ function SignUpForm({
 
     setSubmitting(true)
     try {
-      await onSignUp(email, password, username, recoveryStartDate, favoriteColor)
+      await onSignUp(username, password, recoveryStartDate, favoriteColor)
     } finally {
       setSubmitting(false)
     }
@@ -123,12 +121,12 @@ function SignUpForm({
       )}
 
       <div>
-        <label htmlFor="signup-email">Email</label>
+        <label htmlFor="signup-username">Username</label>
         <input
-          id="signup-email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="signup-username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
         />
@@ -143,18 +141,6 @@ function SignUpForm({
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="signup-username">Username</label>
-        <input
-          id="signup-username"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
           style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
         />
       </div>
