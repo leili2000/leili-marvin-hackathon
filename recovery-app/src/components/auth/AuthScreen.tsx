@@ -3,16 +3,14 @@ import { ColorPicker } from './ColorPicker'
 import { isValidHex } from '../../lib/theme'
 
 interface AuthScreenProps {
-  onSignIn: (email: string, password: string) => Promise<void>
+  onSignIn: (username: string, password: string) => Promise<void>
   onSignUp: (
-    email: string,
-    password: string,
     username: string,
+    password: string,
     recoveryStartDate: string,
     favoriteColor: string
   ) => Promise<void>
   error: string | null
-  loading: boolean
 }
 
 function todayStr(): string {
@@ -22,18 +20,22 @@ function todayStr(): string {
 function SignInForm({
   onSignIn,
   error,
-  loading,
 }: {
   onSignIn: AuthScreenProps['onSignIn']
   error: string | null
-  loading: boolean
 }) {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    onSignIn(email, password)
+    setSubmitting(true)
+    try {
+      await onSignIn(username, password)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -47,12 +49,12 @@ function SignInForm({
       )}
 
       <div>
-        <label htmlFor="signin-email">Email</label>
+        <label htmlFor="signin-username">Username</label>
         <input
-          id="signin-email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="signin-username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
         />
@@ -70,8 +72,8 @@ function SignInForm({
         />
       </div>
 
-      <button type="submit" disabled={loading} style={{ padding: '10px', cursor: 'pointer' }}>
-        {loading ? 'Signing in…' : 'Sign In'}
+      <button type="submit" disabled={submitting} style={{ padding: '10px', cursor: 'pointer' }}>
+        {submitting ? 'Signing in…' : 'Sign In'}
       </button>
     </form>
   )
@@ -80,20 +82,18 @@ function SignInForm({
 function SignUpForm({
   onSignUp,
   error,
-  loading,
 }: {
   onSignUp: AuthScreenProps['onSignUp']
   error: string | null
-  loading: boolean
 }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [recoveryStartDate, setRecoveryStartDate] = useState(todayStr())
   const [favoriteColor, setFavoriteColor] = useState('#4f8a6e')
   const [colorError, setColorError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setColorError(null)
 
@@ -102,7 +102,12 @@ function SignUpForm({
       return
     }
 
-    onSignUp(email, password, username, recoveryStartDate, favoriteColor)
+    setSubmitting(true)
+    try {
+      await onSignUp(username, password, recoveryStartDate, favoriteColor)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -116,12 +121,12 @@ function SignUpForm({
       )}
 
       <div>
-        <label htmlFor="signup-email">Email</label>
+        <label htmlFor="signup-username">Username</label>
         <input
-          id="signup-email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="signup-username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
         />
@@ -136,18 +141,6 @@ function SignUpForm({
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="signup-username">Username</label>
-        <input
-          id="signup-username"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
           style={{ display: 'block', width: '100%', padding: '8px', marginTop: '4px' }}
         />
       </div>
@@ -177,14 +170,14 @@ function SignUpForm({
         )}
       </div>
 
-      <button type="submit" disabled={loading} style={{ padding: '10px', cursor: 'pointer' }}>
-        {loading ? 'Creating account…' : 'Sign Up'}
+      <button type="submit" disabled={submitting} style={{ padding: '10px', cursor: 'pointer' }}>
+        {submitting ? 'Creating account…' : 'Sign Up'}
       </button>
     </form>
   )
 }
 
-export function AuthScreen({ onSignIn, onSignUp, error, loading }: AuthScreenProps) {
+export function AuthScreen({ onSignIn, onSignUp, error }: AuthScreenProps) {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
 
   return (
@@ -193,7 +186,7 @@ export function AuthScreen({ onSignIn, onSignUp, error, loading }: AuthScreenPro
 
       {mode === 'signin' ? (
         <>
-          <SignInForm onSignIn={onSignIn} error={error} loading={loading} />
+          <SignInForm onSignIn={onSignIn} error={error} />
           <p style={{ textAlign: 'center', marginTop: '16px' }}>
             Don't have an account?{' '}
             <button
@@ -214,7 +207,7 @@ export function AuthScreen({ onSignIn, onSignUp, error, loading }: AuthScreenPro
         </>
       ) : (
         <>
-          <SignUpForm onSignUp={onSignUp} error={error} loading={loading} />
+          <SignUpForm onSignUp={onSignUp} error={error} />
           <p style={{ textAlign: 'center', marginTop: '16px' }}>
             Already have an account?{' '}
             <button

@@ -16,60 +16,13 @@
 -- User C: 00000000-0000-0000-0000-000000000003  (Quiet Harbor)
 
 -- ═══════════════════════════════════════════════════════════════════
--- 1. Auth Users
+-- 1. Profiles (with hashed passwords — all passwords: Password123!)
 -- ═══════════════════════════════════════════════════════════════════
-INSERT INTO auth.users (
-  id, instance_id, email, encrypted_password,
-  email_confirmed_at, confirmation_token, recovery_token,
-  email_change, email_change_token_new, email_change_token_current,
-  created_at, updated_at,
-  raw_app_meta_data, raw_user_meta_data,
-  is_super_admin, role, aud
-)
+INSERT INTO profiles (id, username, password_hash, tracking_mode, recovery_start_date, favorite_color, created_at)
 VALUES
-  (
-    '00000000-0000-0000-0000-000000000001',
-    '00000000-0000-0000-0000-000000000000',
-    'sunrisewalker@seed.recover',
-    crypt('Password123!', gen_salt('bf')),
-    now(), '', '', '', '', '',
-    now(), now(),
-    '{"provider":"email","providers":["email"]}',
-    '{"username":"Sunrise Walker","recovery_start_date":"2025-03-01","favorite_color":"#4f8a6e"}',
-    false, 'authenticated', 'authenticated'
-  ),
-  (
-    '00000000-0000-0000-0000-000000000002',
-    '00000000-0000-0000-0000-000000000000',
-    'riverstone@seed.recover',
-    crypt('Password123!', gen_salt('bf')),
-    now(), '', '', '', '', '',
-    now(), now(),
-    '{"provider":"email","providers":["email"]}',
-    '{"username":"River Stone","recovery_start_date":"2025-02-15","favorite_color":"#6b5b95"}',
-    false, 'authenticated', 'authenticated'
-  ),
-  (
-    '00000000-0000-0000-0000-000000000003',
-    '00000000-0000-0000-0000-000000000000',
-    'quietharbor@seed.recover',
-    crypt('Password123!', gen_salt('bf')),
-    now(), '', '', '', '', '',
-    now(), now(),
-    '{"provider":"email","providers":["email"]}',
-    '{"username":"Quiet Harbor","recovery_start_date":"2025-01-10","favorite_color":"#d4a373"}',
-    false, 'authenticated', 'authenticated'
-  )
-ON CONFLICT (id) DO NOTHING;
-
--- ═══════════════════════════════════════════════════════════════════
--- 2. Profiles (in case the auth trigger didn't fire)
--- ═══════════════════════════════════════════════════════════════════
-INSERT INTO profiles (id, username, tracking_mode, recovery_start_date, favorite_color, created_at)
-VALUES
-  ('00000000-0000-0000-0000-000000000001', 'Sunrise Walker',  'daily_checkin',   '2025-03-01', '#4f8a6e', now()),
-  ('00000000-0000-0000-0000-000000000002', 'River Stone',     'auto_increment',  '2025-02-15', '#6b5b95', now()),
-  ('00000000-0000-0000-0000-000000000003', 'Quiet Harbor',    'daily_checkin',   '2025-01-10', '#d4a373', now())
+  ('00000000-0000-0000-0000-000000000001', 'Sunrise Walker',  crypt('Password123!', gen_salt('bf')), 'daily_checkin',   '2025-03-01', '#4f8a6e', now()),
+  ('00000000-0000-0000-0000-000000000002', 'River Stone',     crypt('Password123!', gen_salt('bf')), 'auto_increment',  '2025-02-15', '#6b5b95', now()),
+  ('00000000-0000-0000-0000-000000000003', 'Quiet Harbor',    crypt('Password123!', gen_salt('bf')), 'daily_checkin',   '2025-01-10', '#d4a373', now())
 ON CONFLICT (id) DO NOTHING;
 
 

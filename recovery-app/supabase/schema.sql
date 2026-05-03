@@ -1,9 +1,15 @@
-﻿-- Recovery App — Full Database Schema
+﻿-- Recovery App — Full Database Schema (No Supabase Auth)
+-- Uses custom username/password auth with pgcrypto for hashing.
+-- RLS is disabled — access control is handled in the application layer.
 
--- Profiles
+-- Enable pgcrypto for password hashing
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- ─── Profiles ────────────────────────────────────────────────────
 CREATE TABLE profiles (
-  id                  UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
-  username            TEXT NOT NULL,
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username            TEXT NOT NULL UNIQUE,
+  password_hash       TEXT NOT NULL,
   tracking_mode       TEXT NOT NULL DEFAULT 'auto_increment'
                         CHECK (tracking_mode IN ('daily_checkin', 'auto_increment')),
   recovery_start_date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -11,77 +17,28 @@ CREATE TABLE profiles (
   created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can view and edit their own profile"
-  ON profiles FOR ALL USING (auth.uid() = id);
-
--- Auto-create profile row when a new auth user signs up
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $func$
-BEGIN
-  INSERT INTO public.profiles (id, username, recovery_start_date, favorite_color)
-  VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'username', 'Anonymous'),
-    COALESCE(
-      (NEW.raw_user_meta_data->>'recovery_start_date')::DATE,
-      CURRENT_DATE
-    ),
-    COALESCE(NEW.raw_user_meta_data->>'favorite_color', '#4f8a6e')
-  )
-  ON CONFLICT (id) DO NOTHING;
-  RETURN NEW;
-END;
-$func$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
-
--- Posts (user_id nullable for seed data)
+-- ─── Posts ───────────────────────────────────────────────────────
 CREATE TABLE posts (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id        UUID,
+  user_id        UUID REFERENCES profiles(id) ON DELETE CASCADE,
   type           TEXT NOT NULL CHECK (type IN ('milestone', 'happy', 'vent')),
   content        TEXT NOT NULL,
   anonymous_name TEXT NOT NULL,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Authenticated users can read posts"
-  ON posts FOR SELECT USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Users can create posts"
-  ON posts FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users manage their own posts"
-  ON posts FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own posts"
-  ON posts FOR DELETE USING (auth.uid() = user_id);
-
--- Replies
+-- ─── Replies ─────────────────────────────────────────────────────
 CREATE TABLE replies (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id      UUID REFERENCES posts(id) ON DELETE CASCADE NOT NULL,
   sender_id    UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   content      TEXT NOT NULL,
+  sender_name  TEXT NOT NULL DEFAULT 'Anonymous',
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE replies ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Only sender and recipient can see replies"
-  ON replies FOR SELECT
-  USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
-
-CREATE POLICY "Authenticated users can send replies"
-  ON replies FOR INSERT WITH CHECK (auth.uid() = sender_id);
-
--- Check-ins
+-- ─── Check-ins ───────────────────────────────────────────────────
 CREATE TABLE checkins (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id        UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -95,12 +52,7 @@ CREATE TABLE checkins (
   UNIQUE (user_id, date)
 );
 
-ALTER TABLE checkins ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users manage their own checkins"
-  ON checkins FOR ALL USING (auth.uid() = user_id);
-
--- Relapse Patterns
+-- ─── Relapse Patterns ────────────────────────────────────────────
 CREATE TABLE relapse_patterns (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id      UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -114,12 +66,7 @@ CREATE TABLE relapse_patterns (
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE relapse_patterns ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users manage their own patterns"
-  ON relapse_patterns FOR ALL USING (auth.uid() = user_id);
-
--- Happy Items (NEW)
+-- ─── Happy Items ─────────────────────────────────────────────────
 CREATE TABLE happy_items (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id      UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -130,12 +77,7 @@ CREATE TABLE happy_items (
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE happy_items ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users manage their own happy items"
-  ON happy_items FOR ALL USING (auth.uid() = user_id);
-
--- Relapse Word Flags (NEW)
+-- ─── Relapse Word Flags ──────────────────────────────────────────
 CREATE TABLE relapse_word_flags (
   id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id   UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -145,7 +87,39 @@ CREATE TABLE relapse_word_flags (
   UNIQUE (user_id, word)
 );
 
-ALTER TABLE relapse_word_flags ENABLE ROW LEVEL SECURITY;
+-- ─── Auth helper functions ───────────────────────────────────────
 
-CREATE POLICY "Users manage their own word flags"
-  ON relapse_word_flags FOR ALL USING (auth.uid() = user_id);
+-- Sign up: create a new profile with hashed password
+CREATE OR REPLACE FUNCTION public.signup(
+  p_username TEXT,
+  p_password TEXT,
+  p_recovery_start_date DATE DEFAULT CURRENT_DATE,
+  p_favorite_color TEXT DEFAULT '#4f8a6e'
+)
+RETURNS UUID AS $$
+DECLARE
+  new_id UUID;
+BEGIN
+  INSERT INTO profiles (username, password_hash, recovery_start_date, favorite_color)
+  VALUES (p_username, crypt(p_password, gen_salt('bf')), p_recovery_start_date, p_favorite_color)
+  RETURNING id INTO new_id;
+  RETURN new_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Sign in: verify username + password, return profile id or null
+CREATE OR REPLACE FUNCTION public.signin(
+  p_username TEXT,
+  p_password TEXT
+)
+RETURNS UUID AS $$
+DECLARE
+  found_id UUID;
+BEGIN
+  SELECT id INTO found_id
+  FROM profiles
+  WHERE username = p_username
+    AND password_hash = crypt(p_password, password_hash);
+  RETURN found_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

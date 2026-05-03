@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "name": "Git Commit & Push After Task",
   "description": "After each spec task is completed, stage all changes, commit with the task name, pull from remote, and push to the current branch.",
   "version": "1",

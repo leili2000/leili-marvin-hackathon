@@ -1,16 +1,27 @@
 import { isValidHex } from '../../lib/theme'
 
-const PRESET_COLORS = [
-  '#4f8a6e', // sage green
-  '#5b8fb9', // calm blue
-  '#7b68ae', // soft purple
-  '#b07d62', // warm terracotta
-  '#6a9e8f', // teal
-  '#8e7cc3', // lavender
-  '#c27c5e', // peach
-  '#5c8a4d', // forest green
-  '#6b8fad', // steel blue
-  '#a0785a', // warm brown
+const LIGHT_PRESETS = [
+  { hex: '#4f8a6e', label: 'Sage Green' },
+  { hex: '#5b8fb9', label: 'Calm Blue' },
+  { hex: '#7b68ae', label: 'Soft Purple' },
+  { hex: '#b07d62', label: 'Warm Terracotta' },
+  { hex: '#6a9e8f', label: 'Teal' },
+  { hex: '#8e7cc3', label: 'Lavender' },
+  { hex: '#c27c5e', label: 'Peach' },
+  { hex: '#5c8a4d', label: 'Forest Green' },
+  { hex: '#6b8fad', label: 'Steel Blue' },
+  { hex: '#a0785a', label: 'Warm Brown' },
+]
+
+const DARK_PRESETS = [
+  { hex: '#1a3a2a', label: 'Dark Forest' },
+  { hex: '#1a2a3a', label: 'Dark Navy' },
+  { hex: '#2a1a3a', label: 'Dark Plum' },
+  { hex: '#3a2a1a', label: 'Dark Espresso' },
+  { hex: '#1a3a3a', label: 'Dark Teal' },
+  { hex: '#2d2d3d', label: 'Dark Slate' },
+  { hex: '#1e1e2e', label: 'Midnight' },
+  { hex: '#2a1a2a', label: 'Dark Berry' },
 ]
 
 interface ColorPickerProps {
@@ -22,32 +33,58 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
   const isCustomValid = isValidHex(value)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '8px',
-        }}
-      >
-        {PRESET_COLORS.map((color) => (
-          <button
-            key={color}
-            type="button"
-            aria-label={`Select color ${color}`}
-            onClick={() => onChange(color)}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: color,
-              border: value === color ? '3px solid #333' : '2px solid #ccc',
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          />
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {/* Light themes */}
+      <div>
+        <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '6px' }}>Light themes</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {LIGHT_PRESETS.map((preset) => (
+            <button
+              key={preset.hex}
+              type="button"
+              aria-label={`Select color ${preset.label}`}
+              title={preset.label}
+              onClick={() => onChange(preset.hex)}
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                backgroundColor: preset.hex,
+                border: value === preset.hex ? '3px solid #333' : '2px solid #ccc',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            />
+          ))}
+        </div>
       </div>
+
+      {/* Dark themes */}
+      <div>
+        <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '6px' }}>Dark themes</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {DARK_PRESETS.map((preset) => (
+            <button
+              key={preset.hex}
+              type="button"
+              aria-label={`Select color ${preset.label}`}
+              title={preset.label}
+              onClick={() => onChange(preset.hex)}
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                backgroundColor: preset.hex,
+                border: value === preset.hex ? '3px solid #fff' : '2px solid #555',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Custom hex input */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <label htmlFor="custom-hex">Custom:</label>
         <input

@@ -27,6 +27,7 @@ function AuthenticatedApp({
 }) {
   const [activeTab, setActiveTab] = useState<Tab>('stats')
   const [trackingMode, setTrackingMode] = useState<TrackingMode>(initialTrackingMode)
+  const [currentColor, setCurrentColor] = useState(favoriteColor)
   const [nudgeDismissed, setNudgeDismissed] = useState(false)
 
   const { riskAssessment } = useStats(userId)
@@ -34,6 +35,13 @@ function AuthenticatedApp({
   const handleTrackingModeChange = useCallback((mode: TrackingMode) => {
     setTrackingMode(mode)
   }, [])
+
+  const handleColorChange = useCallback(async (color: string) => {
+    setCurrentColor(color)
+    // Persist to database
+    const { supabase } = await import('./lib/supabase')
+    await supabase.from('profiles').update({ favorite_color: color }).eq('id', userId)
+  }, [userId])
 
   const handleDismissNudge = useCallback(() => {
     setNudgeDismissed(true)
@@ -45,7 +53,7 @@ function AuthenticatedApp({
   }, [])
 
   return (
-    <ThemeProvider favoriteColor={favoriteColor}>
+    <ThemeProvider favoriteColor={currentColor}>
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         {/* App Header */}
         <header
@@ -169,8 +177,9 @@ function AuthenticatedApp({
               username={username}
               trackingMode={trackingMode}
               recoveryStartDate={recoveryStartDate}
-              favoriteColor={favoriteColor}
+              favoriteColor={currentColor}
               onTrackingModeChange={handleTrackingModeChange}
+              onColorChange={handleColorChange}
             />
           ) : (
             <SocialTab currentUserId={userId} />
@@ -220,7 +229,6 @@ function App() {
         onSignIn={signIn}
         onSignUp={signUp}
         error={error}
-        loading={false}
       />
     )
   }
