@@ -32,7 +32,7 @@ export function DayDetailModal({ date, checkIn, onSave, onClose }: DayDetailModa
     >
       <div
         style={{
-          background: '#fff',
+          background: 'var(--color-surface)',
           borderRadius: '10px',
           padding: '24px',
           width: '90%',
@@ -56,9 +56,9 @@ export function DayDetailModal({ date, checkIn, onSave, onClose }: DayDetailModa
             style={{
               flex: 1,
               padding: '8px',
-              border: status === 'clean' ? '2px solid #27ae60' : '2px solid #ddd',
+              border: status === 'clean' ? '2px solid #27ae60' : '2px solid var(--color-border)',
               borderRadius: '6px',
-              background: status === 'clean' ? '#e8f8f0' : '#fff',
+              background: status === 'clean' ? '#e8f8f0' : 'var(--color-surface)',
               cursor: 'pointer',
             }}
           >
@@ -70,9 +70,9 @@ export function DayDetailModal({ date, checkIn, onSave, onClose }: DayDetailModa
             style={{
               flex: 1,
               padding: '8px',
-              border: status === 'relapse' ? '2px solid #e74c3c' : '2px solid #ddd',
+              border: status === 'relapse' ? '2px solid #e74c3c' : '2px solid var(--color-border)',
               borderRadius: '6px',
-              background: status === 'relapse' ? '#fdecea' : '#fff',
+              background: status === 'relapse' ? '#fdecea' : 'var(--color-surface)',
               cursor: 'pointer',
             }}
           >
@@ -115,7 +115,7 @@ export function DayDetailModal({ date, checkIn, onSave, onClose }: DayDetailModa
             style={{
               padding: '8px 16px',
               background: 'none',
-              border: '1px solid #ccc',
+              border: '1px solid var(--color-border)',
               borderRadius: '6px',
               cursor: 'pointer',
             }}

@@ -16,7 +16,7 @@ export function DailyCheckIn({ todayCheckIn, onSubmit }: DailyCheckInProps) {
 
   if (todayCheckIn && !editing) {
     return (
-      <div style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '8px' }}>
+      <div style={{ padding: '16px', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
         <h3 style={{ margin: '0 0 8px' }}>Today's Check-In</h3>
         <p style={{ margin: '0 0 4px' }}>
           Status:{' '}
@@ -30,12 +30,12 @@ export function DailyCheckIn({ todayCheckIn, onSubmit }: DailyCheckInProps) {
           </span>
         </p>
         {todayCheckIn.note && (
-          <p style={{ margin: '0 0 4px', fontSize: '0.9em', color: '#555' }}>
+          <p style={{ margin: '0 0 4px', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
             Note: {todayCheckIn.note}
           </p>
         )}
         {todayCheckIn.relapseReason && (
-          <p style={{ margin: '0 0 4px', fontSize: '0.9em', color: '#555' }}>
+          <p style={{ margin: '0 0 4px', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
             Reason: {todayCheckIn.relapseReason}
           </p>
         )}
@@ -46,7 +46,7 @@ export function DailyCheckIn({ todayCheckIn, onSubmit }: DailyCheckInProps) {
             marginTop: '8px',
             padding: '6px 14px',
             background: 'none',
-            border: '1px solid #999',
+            border: '1px solid var(--color-border)',
             borderRadius: '4px',
             cursor: 'pointer',
           }}
@@ -71,7 +71,7 @@ export function DailyCheckIn({ todayCheckIn, onSubmit }: DailyCheckInProps) {
   }
 
   return (
-    <div style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '8px' }}>
+    <div style={{ padding: '16px', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
       <h3 style={{ margin: '0 0 12px' }}>Daily Check-In</h3>
 
       {error && (
@@ -87,9 +87,9 @@ export function DailyCheckIn({ todayCheckIn, onSubmit }: DailyCheckInProps) {
           style={{
             flex: 1,
             padding: '10px',
-            border: status === 'clean' ? '2px solid #27ae60' : '2px solid #ddd',
+            border: status === 'clean' ? '2px solid #27ae60' : '2px solid var(--color-border)',
             borderRadius: '6px',
-            background: status === 'clean' ? '#e8f8f0' : '#fff',
+            background: status === 'clean' ? '#e8f8f0' : 'var(--color-surface)',
             cursor: 'pointer',
             fontWeight: status === 'clean' ? 'bold' : 'normal',
           }}
@@ -102,9 +102,9 @@ export function DailyCheckIn({ todayCheckIn, onSubmit }: DailyCheckInProps) {
           style={{
             flex: 1,
             padding: '10px',
-            border: status === 'relapse' ? '2px solid #e74c3c' : '2px solid #ddd',
+            border: status === 'relapse' ? '2px solid #e74c3c' : '2px solid var(--color-border)',
             borderRadius: '6px',
-            background: status === 'relapse' ? '#fdecea' : '#fff',
+            background: status === 'relapse' ? '#fdecea' : 'var(--color-surface)',
             cursor: 'pointer',
             fontWeight: status === 'relapse' ? 'bold' : 'normal',
           }}

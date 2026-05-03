@@ -195,7 +195,7 @@ export function AuthScreen({ onSignIn, onSignUp, error }: AuthScreenProps) {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#5b8fb9',
+                color: 'var(--color-primary)',
                 cursor: 'pointer',
                 textDecoration: 'underline',
                 padding: 0,
@@ -216,7 +216,7 @@ export function AuthScreen({ onSignIn, onSignUp, error }: AuthScreenProps) {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#5b8fb9',
+                color: 'var(--color-primary)',
                 cursor: 'pointer',
                 textDecoration: 'underline',
                 padding: 0,

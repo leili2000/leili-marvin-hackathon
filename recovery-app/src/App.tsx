@@ -58,8 +58,8 @@ function AuthenticatedApp({
         {/* App Header */}
         <header
           style={{
-            background: '#fff',
-            borderBottom: '1px solid #e2e0db',
+            background: 'var(--color-surface)',
+            borderBottom: '1px solid var(--color-border)',
             position: 'sticky',
             top: 0,
             zIndex: 100,
@@ -81,25 +81,25 @@ function AuthenticatedApp({
                 style={{
                   fontSize: '18px',
                   fontWeight: 700,
-                  color: 'var(--color-primary, #4f8a6e)',
+                  color: 'var(--color-text)',
                 }}
               >
                 Recovery App
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '14px', color: '#6b6b6b' }}>{username}</span>
+              <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>{username}</span>
               <button
                 type="button"
                 onClick={onSignOut}
                 style={{
                   padding: '6px 12px',
                   background: 'transparent',
-                  border: '1px solid #e2e0db',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontSize: '13px',
-                  color: '#555',
+                  color: 'var(--color-text-secondary)',
                 }}
               >
                 Sign out
@@ -115,8 +115,8 @@ function AuthenticatedApp({
             maxWidth: '680px',
             margin: '0 auto',
             width: '100%',
-            background: '#fff',
-            borderBottom: '1px solid #e2e0db',
+            background: 'var(--color-surface)',
+            borderBottom: '1px solid var(--color-border)',
           }}
         >
           <button
@@ -130,10 +130,10 @@ function AuthenticatedApp({
               cursor: 'pointer',
               fontSize: '15px',
               fontWeight: 500,
-              color: activeTab === 'stats' ? 'var(--color-primary, #4f8a6e)' : '#6b6b6b',
+              color: activeTab === 'stats' ? 'var(--color-primary-light)' : 'var(--color-text-secondary)',
               borderBottom:
                 activeTab === 'stats'
-                  ? '2px solid var(--color-primary, #4f8a6e)'
+                  ? '2px solid var(--color-primary)'
                   : '2px solid transparent',
             }}
           >
@@ -150,10 +150,10 @@ function AuthenticatedApp({
               cursor: 'pointer',
               fontSize: '15px',
               fontWeight: 500,
-              color: activeTab === 'social' ? 'var(--color-primary, #4f8a6e)' : '#6b6b6b',
+              color: activeTab === 'social' ? 'var(--color-primary-light)' : 'var(--color-text-secondary)',
               borderBottom:
                 activeTab === 'social'
-                  ? '2px solid var(--color-primary, #4f8a6e)'
+                  ? '2px solid var(--color-primary)'
                   : '2px solid transparent',
             }}
           >

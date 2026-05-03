@@ -47,8 +47,8 @@ export function ReplyBox({ postId, recipientId, onSend, onCancel }: ReplyBoxProp
   }
 
   return (
-    <div style={{ marginTop: '8px', borderTop: '1px solid #eee', paddingTop: '8px' }}>
-      <p style={{ fontSize: '0.75em', color: '#888', margin: '0 0 6px' }}>
+    <div style={{ marginTop: '8px', borderTop: '1px solid var(--color-border)', paddingTop: '8px' }}>
+      <p style={{ fontSize: '0.75em', color: 'var(--color-text-secondary)', margin: '0 0 6px' }}>
         Your reply goes directly to this person — no one else will see it.
       </p>
 
@@ -60,7 +60,7 @@ export function ReplyBox({ postId, recipientId, onSend, onCancel }: ReplyBoxProp
         style={{
           width: '100%',
           padding: '8px',
-          border: '1px solid #ddd',
+          border: '1px solid var(--color-border)',
           borderRadius: '6px',
           fontSize: '0.85em',
           resize: 'vertical',
@@ -81,8 +81,8 @@ export function ReplyBox({ postId, recipientId, onSend, onCancel }: ReplyBoxProp
           disabled={!content.trim() || sending}
           style={{
             padding: '6px 14px',
-            background: !content.trim() || sending ? '#ccc' : 'var(--color-primary, #4f8a6e)',
-            color: !content.trim() || sending ? '#888' : 'var(--color-primary-contrast, #fff)',
+            background: !content.trim() || sending ? 'var(--color-border)' : 'var(--color-primary, #4f8a6e)',
+            color: !content.trim() || sending ? 'var(--color-text-secondary)' : 'var(--color-primary-contrast, #fff)',
             border: 'none',
             borderRadius: '6px',
             cursor: !content.trim() || sending ? 'not-allowed' : 'pointer',
@@ -97,8 +97,8 @@ export function ReplyBox({ postId, recipientId, onSend, onCancel }: ReplyBoxProp
           style={{
             padding: '6px 14px',
             background: 'transparent',
-            color: '#555',
-            border: '1px solid #ddd',
+            color: 'var(--color-text-secondary)',
+            border: '1px solid var(--color-border)',
             borderRadius: '6px',
             cursor: 'pointer',
             fontSize: '0.85em',

@@ -50,7 +50,7 @@ export function AddHappyItemForm({ onSubmit, onCancel }: AddHappyItemFormProps) 
       onSubmit={handleSubmit}
       style={{
         padding: '16px',
-        border: '1px solid #ddd',
+        border: '1px solid var(--color-border)',
         borderRadius: '8px',
         display: 'flex',
         flexDirection: 'column',
@@ -132,7 +132,7 @@ export function AddHappyItemForm({ onSubmit, onCancel }: AddHappyItemFormProps) 
           style={{
             padding: '8px 16px',
             background: 'none',
-            border: '1px solid #ccc',
+            border: '1px solid var(--color-border)',
             borderRadius: '6px',
             cursor: 'pointer',
           }}

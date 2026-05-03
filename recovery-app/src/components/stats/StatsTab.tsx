@@ -146,7 +146,7 @@ export function StatsTab({
   )
 
   if (loading) {
-    return <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>Loading stats…</div>
+    return <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>Loading stats…</div>
   }
 
   return (
@@ -157,7 +157,7 @@ export function StatsTab({
           display: 'flex',
           gap: '4px',
           marginBottom: '20px',
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid var(--color-border)',
           paddingBottom: '8px',
           overflowX: 'auto',
         }}
@@ -171,8 +171,8 @@ export function StatsTab({
               padding: '6px 14px',
               border: 'none',
               borderRadius: '16px',
-              background: activePane === item.key ? 'var(--color-primary, #4f8a6e)' : 'transparent',
-              color: activePane === item.key ? 'var(--color-primary-contrast, #fff)' : '#555',
+              background: activePane === item.key ? 'var(--color-primary-light)' : 'transparent',
+              color: activePane === item.key ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)',
               cursor: 'pointer',
               fontSize: '0.9em',
               fontWeight: activePane === item.key ? 'bold' : 'normal',
@@ -210,20 +210,20 @@ export function StatsTab({
               <div style={{ fontSize: '2em', fontWeight: 'bold', color: 'var(--color-primary, #4f8a6e)' }}>
                 {totalCleanDays}
               </div>
-              <div style={{ fontSize: '0.85em', color: '#555' }}>Total Clean Days</div>
+              <div style={{ fontSize: '0.85em', color: 'var(--color-text-secondary)' }}>Total Clean Days</div>
             </div>
             <div
               style={{
                 flex: 1,
                 minWidth: '140px',
                 padding: '16px',
-                background: '#f0f0f0',
+                background: 'var(--color-surface-hover)',
                 borderRadius: '10px',
                 textAlign: 'center',
               }}
             >
               <div style={{ fontSize: '2em', fontWeight: 'bold' }}>{totalDays}</div>
-              <div style={{ fontSize: '0.85em', color: '#555' }}>Days Since Start</div>
+              <div style={{ fontSize: '0.85em', color: 'var(--color-text-secondary)' }}>Days Since Start</div>
             </div>
           </div>
 
@@ -276,7 +276,7 @@ export function StatsTab({
 
           <div>
             <h3 style={{ margin: '0 0 12px' }}>App Color</h3>
-            <p style={{ fontSize: '0.85em', color: '#666', marginBottom: '10px' }}>
+            <p style={{ fontSize: '0.85em', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>
               Choose a color to personalize the look of the app.
             </p>
             <ColorPicker value={favoriteColor} onChange={onColorChange} />

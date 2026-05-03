@@ -72,7 +72,7 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
   }
 
   if (loading) {
-    return <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>Loading posts…</div>
+    return <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>Loading posts…</div>
   }
 
   return (
@@ -92,9 +92,9 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
           onClick={handleToggleInbox}
           style={{
             padding: '6px 14px',
-            background: showInbox ? 'var(--color-primary, #4f8a6e)' : 'transparent',
-            color: showInbox ? 'var(--color-primary-contrast, #fff)' : 'var(--color-primary, #4f8a6e)',
-            border: '1px solid var(--color-primary, #4f8a6e)',
+            background: showInbox ? 'var(--color-primary-light)' : 'transparent',
+            color: showInbox ? 'var(--color-primary-dark)' : 'var(--color-text)',
+            border: '1px solid var(--color-primary-light)',
             borderRadius: '6px',
             cursor: 'pointer',
             fontSize: '0.85em',
@@ -110,7 +110,7 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
           display: 'flex',
           gap: '4px',
           marginBottom: '16px',
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid var(--color-border)',
           paddingBottom: '8px',
           overflowX: 'auto',
         }}
@@ -124,8 +124,8 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
               padding: '6px 14px',
               border: 'none',
               borderRadius: '16px',
-              background: filter === item.key ? 'var(--color-primary, #4f8a6e)' : 'transparent',
-              color: filter === item.key ? 'var(--color-primary-contrast, #fff)' : '#555',
+              background: filter === item.key ? 'var(--color-primary-light)' : 'transparent',
+              color: filter === item.key ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)',
               cursor: 'pointer',
               fontSize: '0.9em',
               fontWeight: filter === item.key ? 'bold' : 'normal',
