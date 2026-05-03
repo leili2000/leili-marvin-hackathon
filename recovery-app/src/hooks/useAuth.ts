@@ -125,6 +125,13 @@ export function useAuth(): UseAuthReturn {
         return
       }
 
+      // If no session returned, email confirmation is likely required
+      if (!authData.session) {
+        console.warn('SignUp succeeded but no session — email confirmation may be enabled')
+        setError('Account created! Please check your email to confirm, or disable email confirmation in Supabase settings.')
+        return
+      }
+
       // Explicitly insert profile row for reliability (the trigger may also fire)
       if (authData.user) {
         const { error: profileError } = await supabase
