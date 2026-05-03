@@ -1,0 +1,205 @@
+import type { RelapsePattern, RelapseRiskAssessment } from '../../types/index'
+
+interface PatternInsightsProps {
+  patterns: RelapsePattern[]
+  totalCleanDays: number
+  totalDays: number
+  relapseCount: number
+  riskAssessment?: RelapseRiskAssessment
+}
+
+export function PatternInsights({
+  patterns,
+  totalCleanDays,
+  totalDays,
+  relapseCount,
+  riskAssessment,
+}: PatternInsightsProps) {
+  const regressionPatterns = patterns.filter((p) => p.side === 'regression')
+  const protectivePatterns = patterns.filter((p) => p.side === 'protective')
+
+  const showRisk =
+    riskAssessment &&
+    (riskAssessment.overallRisk === 'medium' || riskAssessment.overallRisk === 'high')
+
+  return (
+    <div>
+      <h3 style={{ margin: '0 0 12px' }}>Pattern Insights</h3>
+
+      {/* Summary */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '12px',
+          marginBottom: '16px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div
+          style={{
+            flex: 1,
+            minWidth: '100px',
+            padding: '12px',
+            background: '#e8f8f0',
+            borderRadius: '8px',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#27ae60' }}>
+            {totalCleanDays}
+          </div>
+          <div style={{ fontSize: '0.8em', color: '#555' }}>Clean Days</div>
+        </div>
+        <div
+          style={{
+            flex: 1,
+            minWidth: '100px',
+            padding: '12px',
+            background: '#f0f0f0',
+            borderRadius: '8px',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{totalDays}</div>
+          <div style={{ fontSize: '0.8em', color: '#555' }}>Total Days</div>
+        </div>
+        <div
+          style={{
+            flex: 1,
+            minWidth: '100px',
+            padding: '12px',
+            background: '#fdecea',
+            borderRadius: '8px',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#e74c3c' }}>
+            {relapseCount}
+          </div>
+          <div style={{ fontSize: '0.8em', color: '#555' }}>Relapses</div>
+        </div>
+      </div>
+
+      {/* Risk Assessment */}
+      {showRisk && riskAssessment && (
+        <div
+          style={{
+            padding: '12px',
+            marginBottom: '16px',
+            borderRadius: '8px',
+            border: `1px solid ${riskAssessment.overallRisk === 'high' ? '#e74c3c' : '#f39c12'}`,
+            background: riskAssessment.overallRisk === 'high' ? '#fdecea' : '#fef9e7',
+          }}
+        >
+          <strong>
+            Risk Level: {riskAssessment.overallRisk.charAt(0).toUpperCase() + riskAssessment.overallRisk.slice(1)}
+          </strong>
+          {riskAssessment.triggeringWords.length > 0 && (
+            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: '#555' }}>
+              Triggering words: {riskAssessment.triggeringWords.join(', ')}
+            </p>
+          )}
+          {riskAssessment.numerical.nearestPredictedDate && (
+            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: '#555' }}>
+              Nearest predicted date: {riskAssessment.numerical.nearestPredictedDate}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Regression Patterns */}
+      {regressionPatterns.length > 0 && (
+        <div style={{ marginBottom: '16px' }}>
+          <h4 style={{ margin: '0 0 8px', color: '#e74c3c' }}>Regression Patterns</h4>
+          {regressionPatterns.map((p) => (
+            <div
+              key={p.id}
+              style={{
+                padding: '8px 12px',
+                marginBottom: '6px',
+                border: '1px solid #f5c6cb',
+                borderRadius: '6px',
+                background: '#fff',
+              }}
+            >
+              <strong>{p.patternType}</strong>
+              <span style={{ fontSize: '0.8em', color: '#888', marginLeft: '8px' }}>
+                ×{p.frequency}
+              </span>
+              <div style={{ fontSize: '0.85em', color: '#555' }}>{p.description}</div>
+              {p.tags.length > 0 && (
+                <div style={{ marginTop: '4px' }}>
+                  {p.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        display: 'inline-block',
+                        padding: '1px 6px',
+                        marginRight: '4px',
+                        borderRadius: '10px',
+                        background: '#f0f0f0',
+                        fontSize: '0.75em',
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Protective Patterns */}
+      {protectivePatterns.length > 0 && (
+        <div>
+          <h4 style={{ margin: '0 0 8px', color: '#27ae60' }}>Protective Patterns</h4>
+          {protectivePatterns.map((p) => (
+            <div
+              key={p.id}
+              style={{
+                padding: '8px 12px',
+                marginBottom: '6px',
+                border: '1px solid #c3e6cb',
+                borderRadius: '6px',
+                background: '#fff',
+              }}
+            >
+              <strong>{p.patternType}</strong>
+              <span style={{ fontSize: '0.8em', color: '#888', marginLeft: '8px' }}>
+                ×{p.frequency}
+              </span>
+              <div style={{ fontSize: '0.85em', color: '#555' }}>{p.description}</div>
+              {p.tags.length > 0 && (
+                <div style={{ marginTop: '4px' }}>
+                  {p.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        display: 'inline-block',
+                        padding: '1px 6px',
+                        marginRight: '4px',
+                        borderRadius: '10px',
+                        background: '#f0f0f0',
+                        fontSize: '0.75em',
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {patterns.length === 0 && (
+        <p style={{ color: '#888', fontStyle: 'italic' }}>
+          No patterns detected yet. Keep logging check-ins to build insights.
+        </p>
+      )}
+    </div>
+  )
+}
