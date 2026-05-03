@@ -127,7 +127,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
 - [x] 4. Checkpoint — Ensure all pure function tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement custom hooks (data layer)
+- [x] 5. Implement custom hooks (data layer)
   - [x] 5.1 Implement `useAuth` hook
     - Create `src/hooks/useAuth.ts` with session management, sign-in, sign-up, sign-out, and profile fetching
     - Handle session restoration on page load via `getSession()`
@@ -143,7 +143,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Fetch and expose `RelapseRiskAssessment` for the current user
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3, 7.1, 7.2, 7.4, 7.5, 8.1, 8.6_
 
-  - [~] 5.3 Implement `usePosts` hook
+  - [x] 5.3 Implement `usePosts` hook
     - Create `src/hooks/usePosts.ts` with post fetching (ordered by created_at desc, limit 50), post creation, reply sending, and inbox fetching
     - Implement type-based filtering
     - Expose reply count only for posts owned by the current user
