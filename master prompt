@@ -1,0 +1,20 @@
+Use these languages for our website. Populate the website with fake sample data
+HTML
+Typescript and React
+Supabase
+
+Addiction recovery website. Focus on core features. For the sign in, collect a username and a password. Encrypt and save this information upon account creation. Additionally, collect recovery start date and favorite color upon account creation. This favorite color will be used for the color theme of the website.
+
+There will be two tabs: A social tab and a user “stats” tab.
+On the social tab, you can make posts. Replies will be anonymous and sent directly to you (so they’re not shown to anyone else). Number of replies on a post will not be shown to anyone except the original poster. There will be three types of posts: milestone, something that makes you happy, or a relapse “vent” post. The vent posts will have some barriers every time before users access them, and users will only be shown 3 before they have to go through the barriers again. These barriers need to make sure that the user is in a good mental space before reading challenging posts.
+
+The user stats tab will be the first tab. On the user stats tab, users can choose one of two modes for tracking their progress. The first option is a daily check in. Users will be expected to check in daily and confirm how their day went. If they miss a day, they will have the option to fill in information, but it will not be required.
+The second option is the auto increment option. We will assume users kept their “streak” up, unless they tell us otherwise. They will still be prompted about their day if they log in. We do not want to show the user anything about streaks. The user will instead see stats for how many total days they have not relapsed on.
+Create a calendar widget where users can click once for a clean day and click twice for a relapse day. If they click a day that is before their recorded “recovery start date,” the user will be prompted to change their start date to their clicked on day before any changes to that day can be made. Allow users to see and edit their prompt entries for any given day on the calendar.
+In the User Progress tab, make a tab for things that make the user happy. They can add or remove items. Each item will consist of a title, an optional description, a level of energy needed, and a level of preparation/resources (such as time) needed. 
+
+The user will be encouraged to put a “why” for any relapses. This, along with the number of days between each relapse, will be used to predict relapses.
+GOAL: the website should attempt to predict a relapse so that it can know to provide support
+1 -> analyze numerical patterns of days in between relapses to predict when another might happen
+2 -> analyze words that are often mentioned in the days leading up to a relapse and not often mentioned otherwise. If these words are mentioned, flag a potential relapse
+When a potential relapse is detected, the system should subtly suggest that a user logs a milestone, or it should suggest that the user does something that makes them happy. If it suggests something that makes them happy with a harder difficulty rating, it will ask if they have been able to do that activity in a while. It will randomly generate some or none of this behavior when the user loads a new page. It should not be obtrusive.
