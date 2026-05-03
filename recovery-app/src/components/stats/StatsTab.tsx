@@ -9,6 +9,7 @@ import { DayDetailModal } from './DayDetailModal'
 import { HappyList } from './HappyList'
 import { PatternInsights } from './PatternInsights'
 import { TrackingModeSelector } from './TrackingModeSelector'
+import { ColorPicker } from '../auth/ColorPicker'
 
 type StatsPane = 'overview' | 'calendar' | 'happy' | 'patterns' | 'settings'
 
@@ -19,6 +20,7 @@ interface StatsTabProps {
   recoveryStartDate: string
   favoriteColor: string
   onTrackingModeChange: (mode: TrackingMode) => void
+  onColorChange: (color: string) => void
 }
 
 const NAV_ITEMS: { key: StatsPane; label: string }[] = [
@@ -36,6 +38,7 @@ export function StatsTab({
   recoveryStartDate,
   favoriteColor,
   onTrackingModeChange,
+  onColorChange,
 }: StatsTabProps) {
   const [activePane, setActivePane] = useState<StatsPane>('overview')
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
@@ -268,7 +271,17 @@ export function StatsTab({
 
       {/* Settings Pane */}
       {activePane === 'settings' && (
-        <TrackingModeSelector currentMode={trackingMode} onChange={handleModeChange} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <TrackingModeSelector currentMode={trackingMode} onChange={handleModeChange} />
+
+          <div>
+            <h3 style={{ margin: '0 0 12px' }}>App Color</h3>
+            <p style={{ fontSize: '0.85em', color: '#666', marginBottom: '10px' }}>
+              Choose a color to personalize the look of the app.
+            </p>
+            <ColorPicker value={favoriteColor} onChange={onColorChange} />
+          </div>
+        </div>
       )}
 
       {/* Day Detail Modal */}
