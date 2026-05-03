@@ -96,7 +96,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - **Property 18: askIfDoneRecently set for high-energy items** — when happyItem.energyLevel ≥ 4, askIfDoneRecently = true
     - **Validates: Requirements 11.5**
 
-  - [~] 3.14 Implement `transitionBarrier` function
+  - [x] 3.14 Implement `transitionBarrier` function
     - Create `src/lib/ventBarrier.ts` with the pure `transitionBarrier` state machine function
     - Implement all action types: START, ANSWER, NEXT, PASS, DECLINE, POST_VIEWED, RESET
     - Implement the 3-post reset logic for POST_VIEWED
