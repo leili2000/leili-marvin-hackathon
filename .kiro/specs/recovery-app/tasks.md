@@ -135,7 +135,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Return `AppUser` object with camelCase field mapping from snake_case DB columns
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 15.7_
 
-  - [~] 5.2 Implement `useStats` hook
+  - [x] 5.2 Implement `useStats` hook
     - Create `src/hooks/useStats.ts` with check-in CRUD, happy item CRUD, pattern fetching, word flag fetching, and relapse risk assessment
     - Implement check-in upsert with `(user_id, date)` conflict key
     - Implement fire-and-forget pattern analysis after check-in save
