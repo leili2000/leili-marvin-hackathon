@@ -124,11 +124,11 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - **Property 4: Theme contrast correctness** — lightness > 50% → contrast = #000000, lightness ≤ 50% → contrast = #ffffff
     - **Validates: Requirements 2.4**
 
-- [ ] 4. Checkpoint — Ensure all pure function tests pass
+- [x] 4. Checkpoint — Ensure all pure function tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 5. Implement custom hooks (data layer)
-  - [~] 5.1 Implement `useAuth` hook
+  - [x] 5.1 Implement `useAuth` hook
     - Create `src/hooks/useAuth.ts` with session management, sign-in, sign-up, sign-out, and profile fetching
     - Handle session restoration on page load via `getSession()`
     - On sign-up, create auth user and insert profile row with all fields (username, recovery_start_date, favorite_color, tracking_mode)
