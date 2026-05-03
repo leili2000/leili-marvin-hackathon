@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Leili Branch Priority Merge",
+  "description": "When triggered, pulls leili branch and forces it into main with leili taking priority over all conflicts",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "git fetch origin leili && git checkout origin/leili -- . && git add -A && git commit -m \"sync: leili branch takes priority\" --allow-empty"
+  }
+}
