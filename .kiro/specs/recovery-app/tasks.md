@@ -36,7 +36,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Ensure seed data covers all post types (milestone, happy, vent) and both tracking modes
     - _Requirements: N/A (development support)_
 
-- [ ] 3. Implement pure algorithm functions
+- [x] 3. Implement pure algorithm functions
   - [x] 3.1 Implement `predictNumerical` function
     - Create `src/lib/predictRelapse.ts` with the `predictNumerical` function
     - Extract relapse dates, compute intervals, calculate weighted average, predict date, clamp to today, determine confidence level
@@ -110,7 +110,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - **Property 20: 'no' answer always returns to idle** — DECLINE at any check step returns step='intro', barrierPassed=false, ventPostsViewed=0
     - **Validates: Requirements 12.3**
 
-  - [~] 3.17 Implement theme derivation utilities
+  - [x] 3.17 Implement theme derivation utilities
     - Create `src/lib/theme.ts` with `hexToHsl`, `hslToHex`, and `deriveTheme` functions
     - Implement HSL lightness adjustments: +20 (clamped to 95) for light, -15 (clamped to 10) for dark
     - Implement contrast calculation: #000000 for lightness > 50%, #ffffff otherwise
