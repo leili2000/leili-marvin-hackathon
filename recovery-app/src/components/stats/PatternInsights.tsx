@@ -18,10 +18,6 @@ export function PatternInsights({
   const regressionPatterns = patterns.filter((p) => p.side === 'regression')
   const protectivePatterns = patterns.filter((p) => p.side === 'protective')
 
-  const showRisk =
-    riskAssessment &&
-    (riskAssessment.overallRisk === 'medium' || riskAssessment.overallRisk === 'high')
-
   return (
     <div>
       <h3 style={{ margin: '0 0 12px' }}>Pattern Insights</h3>
@@ -79,33 +75,6 @@ export function PatternInsights({
           <div style={{ fontSize: '0.8em', color: 'var(--color-text-secondary)' }}>Relapses</div>
         </div>
       </div>
-
-      {/* Risk Assessment */}
-      {showRisk && riskAssessment && (
-        <div
-          style={{
-            padding: '12px',
-            marginBottom: '16px',
-            borderRadius: '8px',
-            border: `1px solid ${riskAssessment.overallRisk === 'high' ? '#e74c3c' : '#f39c12'}`,
-            background: riskAssessment.overallRisk === 'high' ? '#fdecea' : '#fef9e7',
-          }}
-        >
-          <strong>
-            Risk Level: {riskAssessment.overallRisk.charAt(0).toUpperCase() + riskAssessment.overallRisk.slice(1)}
-          </strong>
-          {riskAssessment.triggeringWords.length > 0 && (
-            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
-              Triggering words: {riskAssessment.triggeringWords.join(', ')}
-            </p>
-          )}
-          {riskAssessment.numerical.nearestPredictedDate && (
-            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
-              Nearest predicted date: {riskAssessment.numerical.nearestPredictedDate}
-            </p>
-          )}
-        </div>
-      )}
 
       {/* Regression Patterns */}
       {regressionPatterns.length > 0 && (
