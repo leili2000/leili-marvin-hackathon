@@ -54,10 +54,10 @@ export function NewPostForm({ onSubmit }: NewPostFormProps) {
             onClick={() => setType(pt.key)}
             style={{
               padding: '5px 12px',
-              border: type === pt.key ? '2px solid var(--color-primary, #4f8a6e)' : '1px solid var(--color-border)',
+              border: type === pt.key ? '2px solid var(--color-primary-light)' : '1px solid var(--color-border)',
               borderRadius: '16px',
-              background: type === pt.key ? 'var(--color-primary, #4f8a6e)' + '15' : 'var(--color-surface)',
-              color: type === pt.key ? 'var(--color-primary, #4f8a6e)' : 'var(--color-text-secondary)',
+              background: type === pt.key ? 'var(--color-primary-light)' : 'var(--color-surface)',
+              color: type === pt.key ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)',
               cursor: 'pointer',
               fontSize: '0.85em',
               fontWeight: type === pt.key ? 'bold' : 'normal',
