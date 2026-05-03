@@ -69,7 +69,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - **Property 11: Word flags minimum evidence and risk threshold** — every output word has ≥2 occurrences and risk score ≥ 0.6
     - **Validates: Requirements 8.4, 8.5**
 
-  - [~] 3.8 Implement `assessRelapseRisk` function
+  - [x] 3.8 Implement `assessRelapseRisk` function
     - Create `src/lib/assessRisk.ts` with the `assessRelapseRisk` function
     - Combine numerical prediction and word-flag detection into a single `RelapseRiskAssessment`
     - Implement risk level determination logic: numerical proximity + word signal count
