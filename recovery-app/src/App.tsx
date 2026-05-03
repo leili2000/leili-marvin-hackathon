@@ -84,7 +84,7 @@ function AuthenticatedApp({
                   color: 'var(--color-text)',
                 }}
               >
-                Recovery App
+                Recovery Place
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

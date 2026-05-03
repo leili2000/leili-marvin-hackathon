@@ -182,7 +182,7 @@ export function AuthScreen({ onSignIn, onSignUp, error }: AuthScreenProps) {
 
   return (
     <div style={{ maxWidth: '400px', margin: '40px auto', padding: '20px' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Recovery App</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>Recovery Place</h1>
 
       {mode === 'signin' ? (
         <>
