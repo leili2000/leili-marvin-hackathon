@@ -220,7 +220,6 @@ function App() {
         onSignIn={signIn}
         onSignUp={signUp}
         error={error}
-        loading={false}
       />
     )
   }
