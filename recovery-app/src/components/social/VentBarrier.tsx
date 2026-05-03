@@ -200,9 +200,9 @@ export function VentBarrier({ onComplete, onDecline }: VentBarrierProps) {
 
 const containerStyle: React.CSSProperties = {
   padding: '24px',
-  background: '#faf5ff',
+  background: 'var(--color-surface)',
   borderRadius: '12px',
-  border: '1px solid #e8d5f5',
+  border: '1px solid var(--color-border)',
   marginBottom: '16px',
 }
 
