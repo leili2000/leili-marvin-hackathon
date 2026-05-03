@@ -242,22 +242,22 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Display "Couldn't send reply — try again" on failure, preserve draft
     - _Requirements: 14.1, 14.3, 14.5_
 
-- [ ] 10. Implement RelapseNudge component and App shell
-  - [~] 10.1 Implement RelapseNudge overlay/banner
+- [x] 10. Implement RelapseNudge component and App shell
+  - [x] 10.1 Implement RelapseNudge overlay/banner
     - Create `src/components/shared/RelapseNudge.tsx` as a non-blocking overlay or banner
     - Display nudge message from `suggestedAction` with dismiss action
     - Run once per page navigation, not on every render
     - _Requirements: 11.7_
 
-  - [~] 10.2 Implement App shell with routing and tab navigation
+  - [x] 10.2 Implement App shell with routing and tab navigation
     - Rewrite `src/App.tsx` to wire together: AuthScreen (unauthenticated), AppHeader + ThemeProvider + TabNav + StatsTab/SocialTab + RelapseNudge (authenticated)
     - Implement tab switching between Stats and Social
     - Run relapse risk assessment on authenticated load and pass suggestedAction to RelapseNudge
     - Handle sign-out to return to AuthScreen
     - _Requirements: 1.2, 1.5, 1.6, 2.1_
 
-- [ ] 11. Implement global styles and CSS theming
-  - [~] 11.1 Write base CSS with theme custom properties
+- [x] 11. Implement global styles and CSS theming
+  - [x] 11.1 Write base CSS with theme custom properties
     - Update `src/index.css` with CSS custom property usage (`--color-primary`, `--color-primary-light`, `--color-primary-dark`, `--color-primary-contrast`)
     - Style all components using these custom properties for a cohesive themed look
     - Ensure plain HTML/CSS only — no component library
