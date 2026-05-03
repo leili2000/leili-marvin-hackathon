@@ -120,6 +120,7 @@ export function useAuth(): UseAuthReturn {
         })
 
       if (signUpError) {
+        console.error('Supabase signUp error:', signUpError)
         setError(signUpError.message)
         return
       }
