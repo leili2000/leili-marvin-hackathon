@@ -42,16 +42,25 @@ export function useAuth(): UseAuthReturn {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    let mounted = true
+
+    // Timeout fallback — if getSession hangs for more than 5 seconds, stop loading
+    const timeout = setTimeout(() => {
+      if (mounted && loading) {
+        setLoading(false)
+      }
+    }, 5000)
+
     // Restore session on mount
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return
       if (session?.user) {
         const profile = await fetchProfile(session.user.id)
-        setUser(profile)
+        if (mounted) setUser(profile)
       }
-      setLoading(false)
+      if (mounted) setLoading(false)
     }).catch(() => {
-      // If getSession fails (network error, bad config, etc.), stop loading
-      setLoading(false)
+      if (mounted) setLoading(false)
     })
 
     // Listen for auth state changes
@@ -59,16 +68,19 @@ export function useAuth(): UseAuthReturn {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (_event: string, session: Session | null) => {
+        if (!mounted) return
         if (session?.user) {
           const profile = await fetchProfile(session.user.id)
-          setUser(profile)
+          if (mounted) setUser(profile)
         } else {
-          setUser(null)
+          if (mounted) setUser(null)
         }
       }
     )
 
     return () => {
+      mounted = false
+      clearTimeout(timeout)
       subscription.unsubscribe()
     }
   }, [])

@@ -43,7 +43,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Follow the algorithm exactly as specified in the design document
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
 
-  - [-]* 3.2 Write property tests for `predictNumerical`
+  - [x]* 3.2 Write property tests for `predictNumerical`
     - **Property 12: Predicted date is never in the past** — for any sorted check-in array with ≥2 relapses and any today value, predictedDate ≥ today
     - **Validates: Requirements 9.5**
 
