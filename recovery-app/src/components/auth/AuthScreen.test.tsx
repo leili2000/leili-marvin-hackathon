@@ -20,7 +20,6 @@ describe('AuthScreen', () => {
   it('toggles to sign-up form', async () => {
     const user = userEvent.setup()
     render(<AuthScreen {...defaultProps} />)
-
     await user.click(screen.getByRole('button', { name: /sign up/i }))
     expect(screen.getByRole('heading', { name: /sign up/i })).toBeInTheDocument()
     expect(screen.getByLabelText(/recovery start date/i)).toBeInTheDocument()
@@ -29,7 +28,6 @@ describe('AuthScreen', () => {
   it('toggles back to sign-in form', async () => {
     const user = userEvent.setup()
     render(<AuthScreen {...defaultProps} />)
-
     await user.click(screen.getByRole('button', { name: /sign up/i }))
     await user.click(screen.getByRole('button', { name: /sign in/i }))
     expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument()
@@ -39,11 +37,9 @@ describe('AuthScreen', () => {
     const onSignIn = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
     render(<AuthScreen {...defaultProps} onSignIn={onSignIn} />)
-
     await user.type(screen.getByLabelText(/username/i), 'testuser')
     await user.type(screen.getByLabelText(/password/i), 'secret123')
     await user.click(screen.getByRole('button', { name: /sign in$/i }))
-
     expect(onSignIn).toHaveBeenCalledWith('testuser', 'secret123')
   })
 
@@ -57,14 +53,10 @@ describe('AuthScreen', () => {
       const onSignUp = vi.fn().mockResolvedValue(undefined)
       const user = userEvent.setup()
       render(<AuthScreen {...defaultProps} onSignUp={onSignUp} />)
-
       await user.click(screen.getByRole('button', { name: /sign up/i }))
-
       await user.type(screen.getByLabelText(/username/i), 'testuser')
       await user.type(screen.getByLabelText(/password/i), 'pass1234')
-
       await user.click(screen.getByRole('button', { name: /sign up$/i }))
-
       expect(onSignUp).toHaveBeenCalledWith(
         'testuser',
         'pass1234',
@@ -77,18 +69,13 @@ describe('AuthScreen', () => {
       const onSignUp = vi.fn().mockResolvedValue(undefined)
       const user = userEvent.setup()
       render(<AuthScreen {...defaultProps} onSignUp={onSignUp} />)
-
       await user.click(screen.getByRole('button', { name: /sign up/i }))
-
       await user.type(screen.getByLabelText(/username/i), 'testuser')
       await user.type(screen.getByLabelText(/password/i), 'pass1234')
-
       const hexInput = screen.getByLabelText(/custom/i)
       await user.clear(hexInput)
       await user.type(hexInput, 'notahex')
-
       await user.click(screen.getByRole('button', { name: /sign up$/i }))
-
       expect(onSignUp).not.toHaveBeenCalled()
       expect(screen.getByText(/valid hex color/i)).toBeInTheDocument()
     })
@@ -96,7 +83,6 @@ describe('AuthScreen', () => {
     it('displays error from props on sign-up form', async () => {
       const user = userEvent.setup()
       render(<AuthScreen {...defaultProps} error="Username already taken" />)
-
       await user.click(screen.getByRole('button', { name: /sign up/i }))
       expect(screen.getByRole('alert')).toHaveTextContent('Username already taken')
     })

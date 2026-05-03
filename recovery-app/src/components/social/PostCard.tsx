@@ -5,7 +5,7 @@ import { ReplyBox } from './ReplyBox'
 
 interface PostCardProps {
   post: Post
-  currentUserId: string
+  currentUserId?: string
   isOwn: boolean
   onReply: (postId: string, recipientId: string, content: string) => Promise<boolean>
   replyCount?: number
