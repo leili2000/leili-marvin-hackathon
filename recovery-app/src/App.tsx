@@ -81,7 +81,7 @@ function AuthenticatedApp({
                 style={{
                   fontSize: '18px',
                   fontWeight: 700,
-                  color: 'var(--color-primary)',
+                  color: 'var(--color-text)',
                 }}
               >
                 Recovery App
@@ -130,7 +130,7 @@ function AuthenticatedApp({
               cursor: 'pointer',
               fontSize: '15px',
               fontWeight: 500,
-              color: activeTab === 'stats' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              color: activeTab === 'stats' ? 'var(--color-primary-light)' : 'var(--color-text-secondary)',
               borderBottom:
                 activeTab === 'stats'
                   ? '2px solid var(--color-primary)'
@@ -150,7 +150,7 @@ function AuthenticatedApp({
               cursor: 'pointer',
               fontSize: '15px',
               fontWeight: 500,
-              color: activeTab === 'social' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              color: activeTab === 'social' ? 'var(--color-primary-light)' : 'var(--color-text-secondary)',
               borderBottom:
                 activeTab === 'social'
                   ? '2px solid var(--color-primary)'
