@@ -92,9 +92,9 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
           onClick={handleToggleInbox}
           style={{
             padding: '6px 14px',
-            background: showInbox ? 'var(--color-primary, #4f8a6e)' : 'transparent',
-            color: showInbox ? 'var(--color-primary-contrast, #fff)' : 'var(--color-primary, #4f8a6e)',
-            border: '1px solid var(--color-primary, #4f8a6e)',
+            background: showInbox ? 'var(--color-primary-light)' : 'transparent',
+            color: showInbox ? 'var(--color-primary-dark)' : 'var(--color-text)',
+            border: '1px solid var(--color-primary-light)',
             borderRadius: '6px',
             cursor: 'pointer',
             fontSize: '0.85em',
