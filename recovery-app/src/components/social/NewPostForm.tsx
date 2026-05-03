@@ -74,7 +74,7 @@ export function NewPostForm({ onSubmit }: NewPostFormProps) {
         onChange={(e) => setContent(e.target.value)}
         placeholder={
           type === 'milestone'
-            ? 'Share a milestone you're proud of…'
+            ? "Share a milestone you're proud of…"
             : type === 'happy'
               ? 'Share something good that happened…'
               : 'Let it out — this is a safe space…'
