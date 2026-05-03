@@ -11,6 +11,7 @@ export function AutoIncrementPrompt({ lastPromptDate, onConfirm, onRelapse }: Au
   const alreadyLogged = lastPromptDate === today
 
   const [showRelapse, setShowRelapse] = useState(false)
+  const [note, setNote] = useState('')
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +31,7 @@ export function AutoIncrementPrompt({ lastPromptDate, onConfirm, onRelapse }: Au
     setError(null)
     setSubmitting(true)
     try {
-      await onConfirm('')
+      await onConfirm(note)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to confirm')
     } finally {
@@ -62,6 +63,19 @@ export function AutoIncrementPrompt({ lastPromptDate, onConfirm, onRelapse }: Au
 
       {!showRelapse ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div>
+            <label htmlFor="day-note" style={{ fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
+              How was your day? (optional)
+            </label>
+            <textarea
+              id="day-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Anything on your mind today…"
+              rows={2}
+              style={{ width: '100%', padding: '8px', resize: 'vertical', marginTop: '4px' }}
+            />
+          </div>
           <button
             type="button"
             onClick={handleConfirm}
