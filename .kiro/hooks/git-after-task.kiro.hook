@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Git Commit & Push After Task",
+  "description": "After each spec task is completed, stage all changes, commit with the task name, pull from remote, and push to the current branch.",
+  "version": "1",
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A spec task was just completed. Stage all changed files with `git add -A`, then commit with a message describing the completed task, then run `git pull --rebase` followed by `git push`. If there is no remote or the push fails, just report the error and continue. Do not use interactive git commands."
+  }
+}

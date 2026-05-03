@@ -1,116 +1,151 @@
--- ─── Profiles ────────────────────────────────────────────────────
-create table profiles (
-  id uuid references auth.users on delete cascade primary key,
-  username text not null,
-  tracking_mode text not null default 'auto_increment'
-    check (tracking_mode in ('daily_checkin', 'auto_increment')),
-  recovery_start_date date not null default current_date,
-  created_at timestamptz not null default now()
+﻿-- Recovery App — Full Database Schema
+
+-- Profiles
+CREATE TABLE profiles (
+  id                  UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  username            TEXT NOT NULL,
+  tracking_mode       TEXT NOT NULL DEFAULT 'auto_increment'
+                        CHECK (tracking_mode IN ('daily_checkin', 'auto_increment')),
+  recovery_start_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  favorite_color      TEXT NOT NULL DEFAULT '#4f8a6e',
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-alter table profiles enable row level security;
-create policy "Users can view and edit their own profile"
-  on profiles for all using (auth.uid() = id);
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view and edit their own profile"
+  ON profiles FOR ALL USING (auth.uid() = id);
 
 -- Auto-create profile row when a new auth user signs up
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, username, recovery_start_date)
-  values (
-    new.id,
-    coalesce(new.raw_user_meta_data->>'username', 'Anonymous'),
-    coalesce(
-      (new.raw_user_meta_data->>'recovery_start_date')::date,
-      current_date
-    )
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $func$
+BEGIN
+  INSERT INTO public.profiles (id, username, recovery_start_date, favorite_color)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'username', 'Anonymous'),
+    COALESCE(
+      (NEW.raw_user_meta_data->>'recovery_start_date')::DATE,
+      CURRENT_DATE
+    ),
+    COALESCE(NEW.raw_user_meta_data->>'favorite_color', '#4f8a6e')
   )
-  on conflict (id) do nothing;  -- safe to call multiple times
-  return new;
-end;
-$$ language plpgsql security definer;
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$func$ LANGUAGE plpgsql SECURITY DEFINER;
 
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- ─── Posts ───────────────────────────────────────────────────────
--- user_id is nullable so seed posts don't require a real auth user
-create table posts (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid,  -- nullable: seed posts have no real author
-  type text not null check (type in ('milestone', 'happy', 'vent')),
-  content text not null,
-  anonymous_name text not null,
-  created_at timestamptz not null default now()
+-- Posts (user_id nullable for seed data)
+CREATE TABLE posts (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        UUID,
+  type           TEXT NOT NULL CHECK (type IN ('milestone', 'happy', 'vent')),
+  content        TEXT NOT NULL,
+  anonymous_name TEXT NOT NULL,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-alter table posts enable row level security;
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
--- Anyone authenticated can read all posts
-create policy "Authenticated users can read posts"
-  on posts for select using (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can read posts"
+  ON posts FOR SELECT USING (auth.role() = 'authenticated');
 
--- Users can insert their own posts
-create policy "Users can create posts"
-  on posts for insert with check (auth.uid() = user_id);
+CREATE POLICY "Users can create posts"
+  ON posts FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Users can update/delete their own posts
-create policy "Users manage their own posts"
-  on posts for update using (auth.uid() = user_id);
-create policy "Users can delete their own posts"
-  on posts for delete using (auth.uid() = user_id);
+CREATE POLICY "Users manage their own posts"
+  ON posts FOR UPDATE USING (auth.uid() = user_id);
 
--- ─── Replies ─────────────────────────────────────────────────────
-create table replies (
-  id uuid primary key default gen_random_uuid(),
-  post_id uuid references posts(id) on delete cascade not null,
-  sender_id uuid references profiles(id) on delete cascade not null,
-  recipient_id uuid references profiles(id) on delete cascade not null,
-  content text not null,
-  created_at timestamptz not null default now()
+CREATE POLICY "Users can delete their own posts"
+  ON posts FOR DELETE USING (auth.uid() = user_id);
+
+-- Replies
+CREATE TABLE replies (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id      UUID REFERENCES posts(id) ON DELETE CASCADE NOT NULL,
+  sender_id    UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  content      TEXT NOT NULL,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-alter table replies enable row level security;
-create policy "Only sender and recipient can see replies"
-  on replies for select
-  using (auth.uid() = sender_id or auth.uid() = recipient_id);
-create policy "Authenticated users can send replies"
-  on replies for insert with check (auth.uid() = sender_id);
+ALTER TABLE replies ENABLE ROW LEVEL SECURITY;
 
--- ─── Check-ins ───────────────────────────────────────────────────
-create table checkins (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references profiles(id) on delete cascade not null,
-  date date not null,
-  status text not null check (status in ('clean', 'relapse')),
-  note text,
-  relapse_reason text,
-  created_at timestamptz not null default now(),
-  unique (user_id, date)
+CREATE POLICY "Only sender and recipient can see replies"
+  ON replies FOR SELECT
+  USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
+
+CREATE POLICY "Authenticated users can send replies"
+  ON replies FOR INSERT WITH CHECK (auth.uid() = sender_id);
+
+-- Check-ins
+CREATE TABLE checkins (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  date           DATE NOT NULL,
+  status         TEXT NOT NULL CHECK (status IN ('clean', 'relapse')),
+  note           TEXT,
+  relapse_reason TEXT,
+  ai_tags        TEXT[] DEFAULT '{}',
+  ai_processed   BOOLEAN DEFAULT FALSE,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, date)
 );
 
-alter table checkins enable row level security;
-create policy "Users manage their own checkins"
-  on checkins for all using (auth.uid() = user_id);
+ALTER TABLE checkins ENABLE ROW LEVEL SECURITY;
 
--- ─── Relapse Patterns ────────────────────────────────────────────
--- Populated by AI analysis of check-in notes via Puter.js
--- side = 'regression'  → triggers that lead to relapse
--- side = 'protective'  → habits that help stay clean
-create table relapse_patterns (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references profiles(id) on delete cascade not null,
-  pattern_type text not null,
-  description text not null,
-  frequency int not null default 1,
-  tags text[] default '{}',
-  last_seen date,
-  side text not null default 'regression'
-    check (side in ('regression', 'protective')),
-  created_at timestamptz not null default now()
+CREATE POLICY "Users manage their own checkins"
+  ON checkins FOR ALL USING (auth.uid() = user_id);
+
+-- Relapse Patterns
+CREATE TABLE relapse_patterns (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  pattern_type TEXT NOT NULL,
+  description  TEXT NOT NULL,
+  frequency    INT NOT NULL DEFAULT 1,
+  tags         TEXT[] DEFAULT '{}',
+  last_seen    DATE,
+  side         TEXT NOT NULL DEFAULT 'regression'
+                 CHECK (side IN ('regression', 'protective')),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-alter table relapse_patterns enable row level security;
-create policy "Users can view their own patterns"
-  on relapse_patterns for all using (auth.uid() = user_id);
+ALTER TABLE relapse_patterns ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage their own patterns"
+  ON relapse_patterns FOR ALL USING (auth.uid() = user_id);
+
+-- Happy Items (NEW)
+CREATE TABLE happy_items (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  title        TEXT NOT NULL,
+  description  TEXT,
+  energy_level INT NOT NULL DEFAULT 2 CHECK (energy_level BETWEEN 1 AND 5),
+  prep_level   INT NOT NULL DEFAULT 1 CHECK (prep_level BETWEEN 1 AND 5),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE happy_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage their own happy items"
+  ON happy_items FOR ALL USING (auth.uid() = user_id);
+
+-- Relapse Word Flags (NEW)
+CREATE TABLE relapse_word_flags (
+  id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id   UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  word      TEXT NOT NULL,
+  frequency INT NOT NULL DEFAULT 1,
+  last_seen DATE,
+  UNIQUE (user_id, word)
+);
+
+ALTER TABLE relapse_word_flags ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage their own word flags"
+  ON relapse_word_flags FOR ALL USING (auth.uid() = user_id);
