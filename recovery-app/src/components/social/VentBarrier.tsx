@@ -55,10 +55,10 @@ export function VentBarrier({ onComplete, onDecline }: VentBarrierProps) {
   if (state.step === 'intro') {
     return (
       <div style={containerStyle}>
-        <h3 style={{ margin: '0 0 12px', fontSize: '1.1em', color: '#333' }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: '1.1em', color: 'var(--color-text)' }}>
           Before you continue…
         </h3>
-        <p style={{ margin: '0 0 16px', fontSize: '0.9em', color: '#555', lineHeight: 1.5 }}>
+        <p style={{ margin: '0 0 16px', fontSize: '0.9em', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
           Vent posts can contain heavy content. We want to make sure you're in a good
           headspace before reading them. This quick check-in takes about 30 seconds.
         </p>
@@ -114,10 +114,10 @@ export function VentBarrier({ onComplete, onDecline }: VentBarrierProps) {
 
     return (
       <div style={containerStyle}>
-        <p style={{ margin: '0 0 4px', fontSize: '0.75em', color: '#999' }}>
+        <p style={{ margin: '0 0 4px', fontSize: '0.75em', color: 'var(--color-text-secondary)' }}>
           Step {stepNumber} of 3
         </p>
-        <h3 style={{ margin: '0 0 16px', fontSize: '1.05em', color: '#333' }}>
+        <h3 style={{ margin: '0 0 16px', fontSize: '1.05em', color: 'var(--color-text)' }}>
           {currentCheck.question}
         </h3>
 
@@ -131,12 +131,12 @@ export function VentBarrier({ onComplete, onDecline }: VentBarrierProps) {
                 padding: '10px 16px',
                 border: currentAnswer === opt.value
                   ? '2px solid var(--color-primary, #4f8a6e)'
-                  : '1px solid #ddd',
+                  : '1px solid var(--color-border)',
                 borderRadius: '8px',
                 background: currentAnswer === opt.value
                   ? 'var(--color-primary, #4f8a6e)' + '15'
-                  : '#fff',
-                color: '#333',
+                  : 'var(--color-surface)',
+                color: 'var(--color-text)',
                 cursor: 'pointer',
                 fontSize: '0.9em',
                 textAlign: 'left',
@@ -176,10 +176,10 @@ export function VentBarrier({ onComplete, onDecline }: VentBarrierProps) {
   if (state.step === 'ready') {
     return (
       <div style={containerStyle}>
-        <h3 style={{ margin: '0 0 12px', fontSize: '1.1em', color: '#333' }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: '1.1em', color: 'var(--color-text)' }}>
           You're all set
         </h3>
-        <p style={{ margin: '0 0 16px', fontSize: '0.9em', color: '#555', lineHeight: 1.5 }}>
+        <p style={{ margin: '0 0 16px', fontSize: '0.9em', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
           Remember, you can step away at any time. Take care of yourself first.
         </p>
         <button
@@ -220,8 +220,8 @@ const primaryBtnStyle: React.CSSProperties = {
 const secondaryBtnStyle: React.CSSProperties = {
   padding: '10px 20px',
   background: 'transparent',
-  color: '#555',
-  border: '1px solid #ddd',
+  color: 'var(--color-text-secondary)',
+  border: '1px solid var(--color-border)',
   borderRadius: '8px',
   cursor: 'pointer',
   fontSize: '0.9em',

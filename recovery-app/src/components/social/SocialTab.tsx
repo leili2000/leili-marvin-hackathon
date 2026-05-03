@@ -72,7 +72,7 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
   }
 
   if (loading) {
-    return <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>Loading posts…</div>
+    return <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>Loading posts…</div>
   }
 
   return (
@@ -110,7 +110,7 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
           display: 'flex',
           gap: '4px',
           marginBottom: '16px',
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid var(--color-border)',
           paddingBottom: '8px',
           overflowX: 'auto',
         }}
@@ -125,7 +125,7 @@ export function SocialTab({ currentUserId }: SocialTabProps) {
               border: 'none',
               borderRadius: '16px',
               background: filter === item.key ? 'var(--color-primary, #4f8a6e)' : 'transparent',
-              color: filter === item.key ? 'var(--color-primary-contrast, #fff)' : '#555',
+              color: filter === item.key ? 'var(--color-primary-contrast, #fff)' : 'var(--color-text-secondary)',
               cursor: 'pointer',
               fontSize: '0.9em',
               fontWeight: filter === item.key ? 'bold' : 'normal',

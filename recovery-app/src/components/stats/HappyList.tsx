@@ -47,7 +47,7 @@ export function HappyList({ items, onAdd, onRemove }: HappyListProps) {
       )}
 
       {items.length === 0 ? (
-        <p style={{ color: '#888', fontStyle: 'italic' }}>
+        <p style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
           No items yet. Add something that makes you happy!
         </p>
       ) : (

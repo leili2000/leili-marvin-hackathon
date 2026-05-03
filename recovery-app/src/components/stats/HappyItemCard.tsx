@@ -13,8 +13,8 @@ function LevelBadge({ label, level }: { label: string; level: number }) {
         padding: '2px 8px',
         borderRadius: '12px',
         fontSize: '0.8em',
-        background: '#f0f0f0',
-        color: '#555',
+        background: 'var(--color-surface-hover)',
+        color: 'var(--color-text-secondary)',
         marginRight: '6px',
       }}
     >
@@ -28,7 +28,7 @@ export function HappyItemCard({ item, onRemove }: HappyItemCardProps) {
     <div
       style={{
         padding: '12px',
-        border: '1px solid #ddd',
+        border: '1px solid var(--color-border)',
         borderRadius: '8px',
         display: 'flex',
         justifyContent: 'space-between',
@@ -39,7 +39,7 @@ export function HappyItemCard({ item, onRemove }: HappyItemCardProps) {
       <div style={{ flex: 1 }}>
         <strong>{item.title}</strong>
         {item.description && (
-          <p style={{ margin: '4px 0 8px', fontSize: '0.9em', color: '#555' }}>
+          <p style={{ margin: '4px 0 8px', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
             {item.description}
           </p>
         )}
@@ -55,7 +55,7 @@ export function HappyItemCard({ item, onRemove }: HappyItemCardProps) {
         style={{
           background: 'none',
           border: 'none',
-          color: '#999',
+          color: 'var(--color-text-secondary)',
           cursor: 'pointer',
           fontSize: '1.2em',
           padding: '4px',

@@ -16,7 +16,7 @@ export function InboxPanel({ replies, onClose }: InboxPanelProps) {
         bottom: 0,
         width: '320px',
         maxWidth: '100vw',
-        background: '#fff',
+        background: 'var(--color-surface)',
         boxShadow: '-2px 0 12px rgba(0,0,0,0.15)',
         zIndex: 100,
         display: 'flex',
@@ -30,7 +30,7 @@ export function InboxPanel({ replies, onClose }: InboxPanelProps) {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '16px',
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid var(--color-border)',
         }}
       >
         <h3 style={{ margin: 0, fontSize: '1.1em' }}>Inbox</h3>
@@ -42,7 +42,7 @@ export function InboxPanel({ replies, onClose }: InboxPanelProps) {
             border: 'none',
             fontSize: '1.2em',
             cursor: 'pointer',
-            color: '#555',
+            color: 'var(--color-text-secondary)',
             padding: '4px 8px',
           }}
         >
@@ -53,7 +53,7 @@ export function InboxPanel({ replies, onClose }: InboxPanelProps) {
       {/* Reply list */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
         {replies.length === 0 ? (
-          <p style={{ color: '#888', fontSize: '0.9em', textAlign: 'center', marginTop: '40px' }}>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9em', textAlign: 'center', marginTop: '40px' }}>
             No replies yet
           </p>
         ) : (
@@ -63,7 +63,7 @@ export function InboxPanel({ replies, onClose }: InboxPanelProps) {
               style={{
                 padding: '12px',
                 marginBottom: '8px',
-                background: '#f9f9f9',
+                background: 'var(--color-surface-hover)',
                 borderRadius: '8px',
                 borderLeft: '3px solid var(--color-primary, #4f8a6e)',
               }}
@@ -75,14 +75,14 @@ export function InboxPanel({ replies, onClose }: InboxPanelProps) {
                   marginBottom: '6px',
                 }}
               >
-                <span style={{ fontWeight: 'bold', fontSize: '0.85em', color: '#333' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '0.85em', color: 'var(--color-text)' }}>
                   {reply.senderName}
                 </span>
-                <span style={{ fontSize: '0.75em', color: '#999' }}>
+                <span style={{ fontSize: '0.75em', color: 'var(--color-text-secondary)' }}>
                   {timeAgo(reply.createdAt)}
                 </span>
               </div>
-              <p style={{ margin: 0, fontSize: '0.9em', color: '#444', lineHeight: 1.4 }}>
+              <p style={{ margin: 0, fontSize: '0.9em', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
                 {reply.content}
               </p>
             </div>

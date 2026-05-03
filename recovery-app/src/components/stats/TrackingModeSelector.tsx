@@ -34,14 +34,14 @@ export function TrackingModeSelector({ currentMode, onChange }: TrackingModeSele
               width: '100%',
               textAlign: 'left',
               padding: '14px',
-              border: isSelected ? '2px solid var(--color-primary, #4f8a6e)' : '2px solid #ddd',
+              border: isSelected ? '2px solid var(--color-primary, #4f8a6e)' : '2px solid var(--color-border)',
               borderRadius: '8px',
-              background: isSelected ? 'var(--color-primary-light, #e8f5e9)' : '#fff',
+              background: isSelected ? 'var(--color-primary-light, #e8f5e9)' : 'var(--color-surface)',
               cursor: 'pointer',
             }}
           >
             <strong>{mode.label}</strong>
-            <div style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>
+            <div style={{ fontSize: '0.85em', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
               {mode.description}
             </div>
           </button>

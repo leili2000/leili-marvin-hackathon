@@ -17,7 +17,7 @@ export function AutoIncrementPrompt({ lastPromptDate, onConfirm, onRelapse }: Au
 
   if (alreadyLogged) {
     return (
-      <div style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '8px' }}>
+      <div style={{ padding: '16px', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
         <h3 style={{ margin: '0 0 8px' }}>Today's Status</h3>
         <p style={{ margin: 0, color: '#27ae60', fontWeight: 'bold' }}>
           ✓ Logged for today
@@ -51,7 +51,7 @@ export function AutoIncrementPrompt({ lastPromptDate, onConfirm, onRelapse }: Au
   }
 
   return (
-    <div style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '8px' }}>
+    <div style={{ padding: '16px', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
       <h3 style={{ margin: '0 0 12px' }}>Quick Check-In</h3>
 
       {error && (
@@ -84,9 +84,9 @@ export function AutoIncrementPrompt({ lastPromptDate, onConfirm, onRelapse }: Au
             style={{
               padding: '10px',
               background: 'none',
-              border: '1px solid #ccc',
+              border: '1px solid var(--color-border)',
               borderRadius: '6px',
-              color: '#666',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer',
               fontSize: '0.9em',
             }}
@@ -129,7 +129,7 @@ export function AutoIncrementPrompt({ lastPromptDate, onConfirm, onRelapse }: Au
               style={{
                 padding: '10px',
                 background: 'none',
-                border: '1px solid #ccc',
+                border: '1px solid var(--color-border)',
                 borderRadius: '6px',
                 cursor: 'pointer',
               }}

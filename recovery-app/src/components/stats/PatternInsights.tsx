@@ -48,20 +48,20 @@ export function PatternInsights({
           <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#27ae60' }}>
             {totalCleanDays}
           </div>
-          <div style={{ fontSize: '0.8em', color: '#555' }}>Clean Days</div>
+          <div style={{ fontSize: '0.8em', color: 'var(--color-text-secondary)' }}>Clean Days</div>
         </div>
         <div
           style={{
             flex: 1,
             minWidth: '100px',
             padding: '12px',
-            background: '#f0f0f0',
+            background: 'var(--color-surface-hover)',
             borderRadius: '8px',
             textAlign: 'center',
           }}
         >
           <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{totalDays}</div>
-          <div style={{ fontSize: '0.8em', color: '#555' }}>Total Days</div>
+          <div style={{ fontSize: '0.8em', color: 'var(--color-text-secondary)' }}>Total Days</div>
         </div>
         <div
           style={{
@@ -76,7 +76,7 @@ export function PatternInsights({
           <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#e74c3c' }}>
             {relapseCount}
           </div>
-          <div style={{ fontSize: '0.8em', color: '#555' }}>Relapses</div>
+          <div style={{ fontSize: '0.8em', color: 'var(--color-text-secondary)' }}>Relapses</div>
         </div>
       </div>
 
@@ -95,12 +95,12 @@ export function PatternInsights({
             Risk Level: {riskAssessment.overallRisk.charAt(0).toUpperCase() + riskAssessment.overallRisk.slice(1)}
           </strong>
           {riskAssessment.triggeringWords.length > 0 && (
-            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: '#555' }}>
+            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
               Triggering words: {riskAssessment.triggeringWords.join(', ')}
             </p>
           )}
           {riskAssessment.numerical.nearestPredictedDate && (
-            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: '#555' }}>
+            <p style={{ margin: '4px 0 0', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
               Nearest predicted date: {riskAssessment.numerical.nearestPredictedDate}
             </p>
           )}
@@ -119,14 +119,14 @@ export function PatternInsights({
                 marginBottom: '6px',
                 border: '1px solid #f5c6cb',
                 borderRadius: '6px',
-                background: '#fff',
+                background: 'var(--color-surface)',
               }}
             >
               <strong>{p.patternType}</strong>
-              <span style={{ fontSize: '0.8em', color: '#888', marginLeft: '8px' }}>
+              <span style={{ fontSize: '0.8em', color: 'var(--color-text-secondary)', marginLeft: '8px' }}>
                 ×{p.frequency}
               </span>
-              <div style={{ fontSize: '0.85em', color: '#555' }}>{p.description}</div>
+              <div style={{ fontSize: '0.85em', color: 'var(--color-text-secondary)' }}>{p.description}</div>
               {p.tags.length > 0 && (
                 <div style={{ marginTop: '4px' }}>
                   {p.tags.map((tag) => (
@@ -137,7 +137,7 @@ export function PatternInsights({
                         padding: '1px 6px',
                         marginRight: '4px',
                         borderRadius: '10px',
-                        background: '#f0f0f0',
+                        background: 'var(--color-surface-hover)',
                         fontSize: '0.75em',
                       }}
                     >
@@ -163,14 +163,14 @@ export function PatternInsights({
                 marginBottom: '6px',
                 border: '1px solid #c3e6cb',
                 borderRadius: '6px',
-                background: '#fff',
+                background: 'var(--color-surface)',
               }}
             >
               <strong>{p.patternType}</strong>
-              <span style={{ fontSize: '0.8em', color: '#888', marginLeft: '8px' }}>
+              <span style={{ fontSize: '0.8em', color: 'var(--color-text-secondary)', marginLeft: '8px' }}>
                 ×{p.frequency}
               </span>
-              <div style={{ fontSize: '0.85em', color: '#555' }}>{p.description}</div>
+              <div style={{ fontSize: '0.85em', color: 'var(--color-text-secondary)' }}>{p.description}</div>
               {p.tags.length > 0 && (
                 <div style={{ marginTop: '4px' }}>
                   {p.tags.map((tag) => (
@@ -181,7 +181,7 @@ export function PatternInsights({
                         padding: '1px 6px',
                         marginRight: '4px',
                         borderRadius: '10px',
-                        background: '#f0f0f0',
+                        background: 'var(--color-surface-hover)',
                         fontSize: '0.75em',
                       }}
                     >
@@ -196,7 +196,7 @@ export function PatternInsights({
       )}
 
       {patterns.length === 0 && (
-        <p style={{ color: '#888', fontStyle: 'italic' }}>
+        <p style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
           No patterns detected yet. Keep logging check-ins to build insights.
         </p>
       )}

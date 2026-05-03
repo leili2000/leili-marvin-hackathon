@@ -26,7 +26,7 @@ export function PostFeed({
         style={{
           textAlign: 'center',
           padding: '32px 16px',
-          color: '#888',
+          color: 'var(--color-text-secondary)',
         }}
       >
         <p style={{ margin: '0 0 12px', color: '#e74c3c' }}>Couldn't load posts</p>
@@ -53,7 +53,7 @@ export function PostFeed({
 
   if (posts.length === 0) {
     return (
-      <p style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: '0.9em' }}>
+      <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '32px 0', fontSize: '0.9em' }}>
         No posts yet — be the first to share.
       </p>
     )

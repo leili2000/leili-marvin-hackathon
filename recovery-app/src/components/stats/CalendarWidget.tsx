@@ -90,19 +90,19 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
     const status = checkInMap.get(dateStr) ?? null
     const isToday = dateStr === todayStr
 
-    let background = '#fff'
-    let color = '#333'
+    let background = 'var(--color-surface)'
+    let color = 'var(--color-text)'
     let border = '1px solid transparent'
     let opacity = 1
     let cursor: React.CSSProperties['cursor'] = 'pointer'
 
     if (isFuture) {
-      background = '#f5f5f5'
+      background = 'var(--color-surface-hover)'
       color = '#bbb'
       cursor = 'default'
       opacity = 0.6
     } else if (isBeforeStart) {
-      background = '#fafafa'
+      background = 'var(--color-surface-hover)'
       color = '#ccc'
       cursor = 'pointer'
     } else if (status === 'clean') {
@@ -112,8 +112,8 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
       background = '#f8d7da'
       color = '#721c24'
     } else {
-      background = '#f0f0f0'
-      color = '#666'
+      background = 'var(--color-surface-hover)'
+      color = 'var(--color-text-secondary)'
     }
 
     if (isToday) {
@@ -194,7 +194,7 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
           onClick={handlePrev}
           style={{
             background: 'none',
-            border: '1px solid #ccc',
+            border: '1px solid var(--color-border)',
             borderRadius: '4px',
             padding: '4px 10px',
             cursor: 'pointer',
@@ -210,7 +210,7 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
           onClick={handleNext}
           style={{
             background: 'none',
-            border: '1px solid #ccc',
+            border: '1px solid var(--color-border)',
             borderRadius: '4px',
             padding: '4px 10px',
             cursor: 'pointer',
@@ -231,7 +231,7 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
         }}
       >
         {DAY_HEADERS.map((d) => (
-          <div key={d} style={{ fontSize: '0.75em', color: '#888', fontWeight: 'bold' }}>
+          <div key={d} style={{ fontSize: '0.75em', color: 'var(--color-text-secondary)', fontWeight: 'bold' }}>
             {d}
           </div>
         ))}
@@ -255,7 +255,7 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
           gap: '12px',
           marginTop: '12px',
           fontSize: '0.8em',
-          color: '#666',
+          color: 'var(--color-text-secondary)',
           flexWrap: 'wrap',
         }}
       >
@@ -281,7 +281,7 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
         >
           <div
             style={{
-              background: '#fff',
+              background: 'var(--color-surface)',
               borderRadius: '10px',
               padding: '24px',
               maxWidth: '360px',
@@ -290,7 +290,7 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
             onClick={(e) => e.stopPropagation()}
           >
             <h4 style={{ margin: '0 0 8px' }}>Before Recovery Start Date</h4>
-            <p style={{ margin: '0 0 16px', fontSize: '0.9em', color: '#555' }}>
+            <p style={{ margin: '0 0 16px', fontSize: '0.9em', color: 'var(--color-text-secondary)' }}>
               This date ({startDatePrompt}) is before your recovery start date ({recoveryStartDate}).
               Would you like to update your start date?
             </p>
@@ -301,7 +301,7 @@ export function CalendarWidget({ checkIns, recoveryStartDate, onDayUpdate, onDay
                 style={{
                   padding: '8px 16px',
                   background: 'none',
-                  border: '1px solid #ccc',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '6px',
                   cursor: 'pointer',
                 }}

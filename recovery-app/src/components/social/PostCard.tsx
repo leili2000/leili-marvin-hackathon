@@ -37,16 +37,16 @@ export function PostCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const typeInfo = TYPE_LABELS[post.type] ?? { label: post.type, color: '#555' }
+  const typeInfo = TYPE_LABELS[post.type] ?? { label: post.type, color: 'var(--color-text-secondary)' }
 
   return (
     <div
       style={{
         padding: '14px 16px',
         marginBottom: '10px',
-        background: '#fff',
+        background: 'var(--color-surface)',
         borderRadius: '10px',
-        border: '1px solid #eee',
+        border: '1px solid var(--color-border)',
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       }}
     >
@@ -72,23 +72,23 @@ export function PostCard({
         >
           {typeInfo.label}
         </span>
-        <span style={{ fontSize: '0.85em', fontWeight: 'bold', color: '#333' }}>
+        <span style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'var(--color-text)' }}>
           {post.anonymousName}
         </span>
-        <span style={{ fontSize: '0.75em', color: '#999', marginLeft: 'auto' }}>
+        <span style={{ fontSize: '0.75em', color: 'var(--color-text-secondary)', marginLeft: 'auto' }}>
           {timeAgo(post.createdAt)}
         </span>
       </div>
 
       {/* Content */}
-      <p style={{ margin: '0 0 10px', fontSize: '0.95em', lineHeight: 1.5, color: '#333' }}>
+      <p style={{ margin: '0 0 10px', fontSize: '0.95em', lineHeight: 1.5, color: 'var(--color-text)' }}>
         {post.content}
       </p>
 
       {/* Footer: reply count (own posts only) + reply button */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {isOwn && replyCount !== undefined && replyCount > 0 && (
-          <span style={{ fontSize: '0.8em', color: '#888' }}>
+          <span style={{ fontSize: '0.8em', color: 'var(--color-text-secondary)' }}>
             {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
           </span>
         )}
