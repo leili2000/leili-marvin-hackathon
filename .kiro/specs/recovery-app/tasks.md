@@ -37,7 +37,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - _Requirements: N/A (development support)_
 
 - [ ] 3. Implement pure algorithm functions
-  - [-] 3.1 Implement `predictNumerical` function
+  - [x] 3.1 Implement `predictNumerical` function
     - Create `src/lib/predictRelapse.ts` with the `predictNumerical` function
     - Extract relapse dates, compute intervals, calculate weighted average, predict date, clamp to today, determine confidence level
     - Follow the algorithm exactly as specified in the design document
@@ -55,7 +55,7 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - **Property 14: Weighted average interval correctness** — averageInterval equals round(Σ(interval[i] × (i+1)) / Σ(i+1))
     - **Validates: Requirements 9.4**
 
-  - [~] 3.5 Implement `buildWordFlags` and `detectWordRisk` functions
+  - [x] 3.5 Implement `buildWordFlags` and `detectWordRisk` functions
     - Create `src/lib/analyzeCheckin.ts` with `buildWordFlags` and `detectWordRisk`
     - Implement LOOKBACK_DAYS scanning, stop word filtering, MIN_WORD_LENGTH filtering, Laplace-smoothed risk scoring, and RISK_THRESHOLD filtering
     - Implement `detectWordRisk` to scan recent notes for flagged words
