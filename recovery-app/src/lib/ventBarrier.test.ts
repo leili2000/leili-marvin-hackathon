@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import {
   transitionBarrier,
   initialBarrierState,
-  type BarrierAction,
 } from './ventBarrier'
 import type { BarrierState } from '../types/index'
 

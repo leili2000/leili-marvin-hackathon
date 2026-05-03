@@ -3,9 +3,6 @@ import {
   buildWordFlags,
   detectWordRisk,
   STOP_WORDS,
-  MIN_WORD_LENGTH,
-  RISK_THRESHOLD,
-  LOOKBACK_DAYS,
 } from './analyzeCheckin'
 import type { CheckIn, RelapseWordFlag } from '../types/index'
 
