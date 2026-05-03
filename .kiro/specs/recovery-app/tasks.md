@@ -149,20 +149,20 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Expose reply count only for posts owned by the current user
     - _Requirements: 13.1, 13.2, 13.3, 13.5, 13.6, 14.1, 14.2, 14.3, 14.5_
 
-- [ ] 6. Implement authentication UI
-  - [~] 6.1 Implement AuthScreen with SignInForm and SignUpForm
+- [x] 6. Implement authentication UI
+  - [x] 6.1 Implement AuthScreen with SignInForm and SignUpForm
     - Create `src/components/auth/AuthScreen.tsx` with toggle between sign-in and sign-up forms
     - SignInForm: email + password fields, inline error display for invalid credentials
     - SignUpForm: email, password, username, recovery start date, and favorite color fields
     - Validate favorite_color format (`^#[0-9a-fA-F]{6}$`) before submission
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-  - [~] 6.2 Implement ColorPicker component
+  - [x] 6.2 Implement ColorPicker component
     - Create `src/components/auth/ColorPicker.tsx` with preset color swatches and custom hex input
     - Validate hex format on change
     - _Requirements: 1.1, 1.4_
 
-  - [~] 6.3 Implement ThemeProvider component
+  - [x] 6.3 Implement ThemeProvider component
     - Create `src/components/shared/ThemeProvider.tsx` that calls `deriveTheme` and injects CSS custom properties into `document.documentElement`
     - Apply theme on mount and when `favoriteColor` changes
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
