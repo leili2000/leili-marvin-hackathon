@@ -20,6 +20,7 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
 
 export function PostCard({
   post,
+  currentUserId,
   isOwn,
   onReply,
   replyCount,
