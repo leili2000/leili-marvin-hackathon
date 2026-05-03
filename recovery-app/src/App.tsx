@@ -1,102 +1,240 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useAuth } from './hooks/useAuth'
-import { useTheme } from './hooks/useTheme'
-import { SocialTab } from './components/social/SocialTab'
-import { StatsTab } from './components/stats/StatsTab'
+import { useStats } from './hooks/useStats'
+import { ThemeProvider } from './components/shared/ThemeProvider'
+import { RelapseNudge } from './components/shared/RelapseNudge'
 import { AuthScreen } from './components/auth/AuthScreen'
+import { StatsTab } from './components/stats/StatsTab'
+import { SocialTab } from './components/social/SocialTab'
 import type { TrackingMode } from './types'
-import './App.css'
 
-type Tab = 'social' | 'stats'
+type Tab = 'stats' | 'social'
+
+function AuthenticatedApp({
+  userId,
+  username,
+  trackingMode: initialTrackingMode,
+  recoveryStartDate,
+  favoriteColor,
+  onSignOut,
+}: {
+  userId: string
+  username: string
+  trackingMode: TrackingMode
+  recoveryStartDate: string
+  favoriteColor: string
+  onSignOut: () => Promise<void>
+}) {
+  const [activeTab, setActiveTab] = useState<Tab>('stats')
+  const [trackingMode, setTrackingMode] = useState<TrackingMode>(initialTrackingMode)
+  const [nudgeDismissed, setNudgeDismissed] = useState(false)
+
+  const { riskAssessment } = useStats(userId)
+
+  const handleTrackingModeChange = useCallback((mode: TrackingMode) => {
+    setTrackingMode(mode)
+  }, [])
+
+  const handleDismissNudge = useCallback(() => {
+    setNudgeDismissed(true)
+  }, [])
+
+  const handleLogMilestone = useCallback(() => {
+    setNudgeDismissed(true)
+    setActiveTab('social')
+  }, [])
+
+  return (
+    <ThemeProvider favoriteColor={favoriteColor}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {/* App Header */}
+        <header
+          style={{
+            background: '#fff',
+            borderBottom: '1px solid #e2e0db',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '680px',
+              margin: '0 auto',
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '20px' }}>🌱</span>
+              <span
+                style={{
+                  fontSize: '18px',
+                  fontWeight: 700,
+                  color: 'var(--color-primary, #4f8a6e)',
+                }}
+              >
+                Recovery App
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '14px', color: '#6b6b6b' }}>{username}</span>
+              <button
+                type="button"
+                onClick={onSignOut}
+                style={{
+                  padding: '6px 12px',
+                  background: 'transparent',
+                  border: '1px solid #e2e0db',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  color: '#555',
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Tab Navigation */}
+        <nav
+          style={{
+            display: 'flex',
+            maxWidth: '680px',
+            margin: '0 auto',
+            width: '100%',
+            background: '#fff',
+            borderBottom: '1px solid #e2e0db',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveTab('stats')}
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '15px',
+              fontWeight: 500,
+              color: activeTab === 'stats' ? 'var(--color-primary, #4f8a6e)' : '#6b6b6b',
+              borderBottom:
+                activeTab === 'stats'
+                  ? '2px solid var(--color-primary, #4f8a6e)'
+                  : '2px solid transparent',
+            }}
+          >
+            Stats
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('social')}
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '15px',
+              fontWeight: 500,
+              color: activeTab === 'social' ? 'var(--color-primary, #4f8a6e)' : '#6b6b6b',
+              borderBottom:
+                activeTab === 'social'
+                  ? '2px solid var(--color-primary, #4f8a6e)'
+                  : '2px solid transparent',
+            }}
+          >
+            Social
+          </button>
+        </nav>
+
+        {/* Main Content */}
+        <main
+          style={{
+            flex: 1,
+            maxWidth: '680px',
+            margin: '0 auto',
+            width: '100%',
+            padding: '16px',
+          }}
+        >
+          {activeTab === 'stats' ? (
+            <StatsTab
+              userId={userId}
+              username={username}
+              trackingMode={trackingMode}
+              recoveryStartDate={recoveryStartDate}
+              favoriteColor={favoriteColor}
+              onTrackingModeChange={handleTrackingModeChange}
+            />
+          ) : (
+            <SocialTab currentUserId={userId} />
+          )}
+        </main>
+
+        {/* Relapse Nudge */}
+        {!nudgeDismissed && (
+          <RelapseNudge
+            assessment={riskAssessment}
+            onDismiss={handleDismissNudge}
+            onLogMilestone={handleLogMilestone}
+          />
+        )}
+      </div>
+    </ThemeProvider>
+  )
+}
 
 function App() {
-  const { authState, signIn, signUp, signOut, updateTrackingMode, updateThemeColor } = useAuth()
-  const { mode, toggle: toggleTheme } = useTheme()
-  const [activeTab, setActiveTab] = useState<Tab>('social')
+  const { user, loading, error, signIn, signUp, signOut } = useAuth()
 
-  // ─── Loading ──────────────────────────────────────────────────
-  if (authState.status === 'loading') {
+  // Loading state
+  if (loading) {
     return (
-      <div className="app-loading">
-        <span className="app-loading__logo">🌱</span>
-        <p>Loading...</p>
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          color: '#6b6b6b',
+        }}
+      >
+        <span style={{ fontSize: '40px' }}>🌱</span>
+        <p>Loading…</p>
       </div>
     )
   }
 
-  // ─── Unauthenticated ──────────────────────────────────────────
-  if (authState.status === 'unauthenticated') {
+  // Unauthenticated
+  if (!user) {
     return (
       <AuthScreen
         onSignIn={signIn}
         onSignUp={signUp}
+        error={error}
+        loading={false}
       />
     )
   }
 
-  // ─── Authenticated ────────────────────────────────────────────
-  const { user } = authState
-
-  const handleTrackingModeChange = async (mode: TrackingMode) => {
-    await updateTrackingMode(user.id, mode)
-  }
-
+  // Authenticated
   return (
-    <div className="app">
-      <header className="app-header">
-        <div className="app-header__inner">
-          <div className="app-header__brand">
-            <span className="app-header__logo">🌱</span>
-            <span className="app-header__name">Recover</span>
-          </div>
-          <div className="app-header__right">
-            <button
-              className="theme-toggle"
-              onClick={toggleTheme}
-              aria-label={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-              title={mode === 'light' ? 'Dark mode' : 'Light mode'}
-            >
-              {mode === 'light' ? '🌙' : '☀️'}
-            </button>
-            <span className="app-header__user">{user.username}</span>
-            <button className="btn btn--ghost btn--sm" onClick={signOut}>
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <nav className="app-tabs">
-        <button
-          className={`app-tab ${activeTab === 'social' ? 'app-tab--active' : ''}`}
-          onClick={() => setActiveTab('social')}
-        >
-          Community
-        </button>
-        <button
-          className={`app-tab ${activeTab === 'stats' ? 'app-tab--active' : ''}`}
-          onClick={() => setActiveTab('stats')}
-        >
-          My Progress
-        </button>
-      </nav>
-
-      <main className="app-main">
-        {activeTab === 'social' ? (
-          <SocialTab currentUserId={user.id} />
-        ) : (
-          <StatsTab
-            userId={user.id}
-            username={user.username}
-            trackingMode={user.trackingMode}
-            recoveryStartDate={user.recoveryStartDate}
-            themeColor={user.themeColor}
-            onTrackingModeChange={handleTrackingModeChange}
-            onThemeColorChange={(colorId) => updateThemeColor(user.id, colorId)}
-          />
-        )}
-      </main>
-    </div>
+    <AuthenticatedApp
+      userId={user.id}
+      username={user.username}
+      trackingMode={user.trackingMode}
+      recoveryStartDate={user.recoveryStartDate}
+      favoriteColor={user.favoriteColor}
+      onSignOut={signOut}
+    />
   )
 }
 
