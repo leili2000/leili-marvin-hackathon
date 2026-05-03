@@ -49,6 +49,9 @@ export function useAuth(): UseAuthReturn {
         setUser(profile)
       }
       setLoading(false)
+    }).catch(() => {
+      // If getSession fails (network error, bad config, etc.), stop loading
+      setLoading(false)
     })
 
     // Listen for auth state changes
