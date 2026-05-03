@@ -167,43 +167,43 @@ Rebuild the Recovery App from scratch using spec-driven development. The app is 
     - Apply theme on mount and when `favoriteColor` changes
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 7. Implement Stats tab components
-  - [~] 7.1 Implement StatsTab with sub-navigation
+- [x] 7. Implement Stats tab components
+  - [x] 7.1 Implement StatsTab with sub-navigation
     - Create `src/components/stats/StatsTab.tsx` with StatsNav (overview, calendar, happy, patterns, settings)
     - Conditionally render DailyCheckIn or AutoIncrementPrompt based on tracking mode
     - Include StatCards showing total clean days and days since recovery start
     - _Requirements: 3.1, 3.2_
 
-  - [~] 7.2 Implement DailyCheckIn component
+  - [x] 7.2 Implement DailyCheckIn component
     - Create `src/components/stats/DailyCheckIn.tsx` with status selection (clean/relapse), optional note, optional relapse reason
     - Display inline error on upsert failure, preserve form state
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [~] 7.3 Implement AutoIncrementPrompt component
+  - [x] 7.3 Implement AutoIncrementPrompt component
     - Create `src/components/stats/AutoIncrementPrompt.tsx` with single-tap clean confirmation and relapse option
     - Show existing status if today's check-in already recorded
     - _Requirements: 5.1, 5.2, 5.3_
 
-  - [~] 7.4 Implement CalendarWidget and DayDetailModal
+  - [x] 7.4 Implement CalendarWidget and DayDetailModal
     - Create `src/components/stats/CalendarWidget.tsx` with monthly grid, click-to-cycle (null → clean → relapse → null), start-date guard, future-date guard
     - Create `src/components/stats/DayDetailModal.tsx` for viewing/editing a day's full check-in record
     - Visually distinguish days by status: clean, relapse, unlogged, today, before start date
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-  - [~] 7.5 Implement HappyList, HappyItemCard, and AddHappyItemForm
+  - [x] 7.5 Implement HappyList, HappyItemCard, and AddHappyItemForm
     - Create `src/components/stats/HappyList.tsx` displaying items ordered by creation date descending
     - Create `src/components/stats/HappyItemCard.tsx` with title, description, energy/prep badges, and remove button
     - Create `src/components/stats/AddHappyItemForm.tsx` with validation for energyLevel and prepLevel (1–5 range)
     - Handle deletion failure with error message and item restoration
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-  - [~] 7.6 Implement PatternInsights component
+  - [x] 7.6 Implement PatternInsights component
     - Create `src/components/stats/PatternInsights.tsx` displaying relapse patterns grouped by side (regression/protective)
     - Show total clean days, total days since start, total relapse count
     - Conditionally display risk assessment summary (triggering words, nearest predicted date) when overallRisk is medium or high
     - _Requirements: 16.1, 16.2, 16.3, 16.4_
 
-  - [~] 7.7 Implement TrackingModeSelector component
+  - [x] 7.7 Implement TrackingModeSelector component
     - Create `src/components/stats/TrackingModeSelector.tsx` in the Settings pane
     - Persist mode change to profiles table and trigger immediate re-render
     - _Requirements: 3.3_
